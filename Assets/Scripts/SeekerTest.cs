@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Mathematics;
 using UnityEngine;
 using Rnd = UnityEngine.Random;
 
@@ -35,11 +34,11 @@ public class SeekerTest : MonoBehaviour
 
     #region Agent Stats
     [SerializeField]
-    [Range(1f,10f)]
-    private float mass, maxSpeed, maxForce;
-    [SerializeField]
     [Range(0f, 10f)]
     private float futureTime;
+    [SerializeField]
+    [Range(1f,10f)]
+    private float mass, maxForce, maxSpeed;
     #endregion
     #region Force Weight
     [Range(1, 10)]
@@ -69,7 +68,7 @@ public class SeekerTest : MonoBehaviour
         
         collisionChecker.SetSceneChecker((int)sceneChecker);
         collisionChecker.SetDummyObject(dummy);
-        collisionChecker.SetSeeker(seeker.GetComponent<Seeker>());
+        collisionChecker.SetSeeker(seekerComponent);
     }
 
     void Update()
@@ -98,7 +97,10 @@ public class SeekerTest : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireCube(seekerComponent.WallBounds.center, seekerComponent.WallBounds.size);
+        if (Application.isPlaying)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireCube(seekerComponent.WallBounds.center, seekerComponent.WallBounds.size);
+        }
     }
 }

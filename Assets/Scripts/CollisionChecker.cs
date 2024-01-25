@@ -81,8 +81,8 @@ public class CollisionChecker : MonoBehaviour
         switch (sceneChecker)
         {
             case SceneChecker.SeekerTest:
-                Gizmos.DrawWireSphere(seeker.Position, seeker.Radius);
-                Gizmos.DrawWireSphere(dummyObject.transform.position, dummyObjectRadius);
+                //Gizmos.DrawWireSphere(seeker.Position, seeker.Radius);
+                //Gizmos.DrawWireSphere(dummyObject.transform.position, dummyObjectRadius);
                 break;
         }
     }

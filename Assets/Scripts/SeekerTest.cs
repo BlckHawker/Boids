@@ -30,18 +30,21 @@ public class SeekerTest : MonoBehaviour
     private Seeker seekerPrefab;
 
     private GameObject dummy, seeker;
-    Seeker seekerComponent;
+    private Seeker seekerComponent;
     #endregion
 
     #region Agent Stats
     [SerializeField]
-    [Range(1,10)]
+    [Range(1f,10f)]
     private float mass, maxSpeed, maxForce;
+    [SerializeField]
+    [Range(0f, 10f)]
+    private float futureTime;
     #endregion
     #region Force Weight
     [Range(1, 10)]
     [SerializeField]
-    private float seekerWeight;
+    private float seekerWeight, stayInBoundsWeight;
     #endregion
 
     #region Screen Position
@@ -51,6 +54,9 @@ public class SeekerTest : MonoBehaviour
 
     void Start()
     {
+        float height = 2f * camera.orthographicSize;
+        float width = height * camera.aspect;
+
         dummy = Instantiate(dumbPrefab);
         dummy.transform.position = GetRandomPosition();
 
@@ -58,9 +64,9 @@ public class SeekerTest : MonoBehaviour
         seeker.transform.position = GetRandomPosition();
         seekerComponent = seeker.GetComponent<Seeker>();
         seekerComponent.Target = dummy;
+        seekerComponent.WallBounds = new Bounds(Vector2.zero, new Vector2(width, height));
         UpdateValues();
-
-
+        
         collisionChecker.SetSceneChecker((int)sceneChecker);
         collisionChecker.SetDummyObject(dummy);
         collisionChecker.SetSeeker(seeker.GetComponent<Seeker>());
@@ -70,16 +76,17 @@ public class SeekerTest : MonoBehaviour
     {
         if (collisionChecker.CircleCollision())
             dummy.transform.position = GetRandomPosition();
-
         UpdateValues();
     }
 
     private void UpdateValues()
     {
-        seeker.GetComponent<Seeker>().Mass = mass;
-        seeker.GetComponent<Seeker>().MaxForce = maxForce;
-        seeker.GetComponent<Seeker>().SeekerWeight = seekerWeight;
-        seeker.GetComponent<Seeker>().MaxSpeed = maxSpeed;
+        seekerComponent.Mass = mass;
+        seekerComponent.MaxForce = maxForce;
+        seekerComponent.SeekerWeight = seekerWeight;
+        seekerComponent.MaxSpeed = maxSpeed;
+        seekerComponent.StayInBoundsWeight = stayInBoundsWeight;
+        seekerComponent.FutureTime = futureTime;
     }
 
     private Vector3 GetRandomPosition()
@@ -87,5 +94,11 @@ public class SeekerTest : MonoBehaviour
         Vector3 pos = camera.ScreenToWorldPoint(new Vector3(Rnd.Range(0, camera.pixelWidth), Rnd.Range(0, camera.pixelHeight)));
         pos.z = 0;
         return pos;
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireCube(seekerComponent.WallBounds.center, seekerComponent.WallBounds.size);
     }
 }

@@ -1,20 +1,24 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.GraphicsBuffer;
 
 public class Seeker : Agent
 {
     private GameObject target;
     public GameObject Target { set { target = value; } }
     public float SeekerWeight { set { seekerWeight = value; } }
+    public float StayInBoundsWeight { set { stayInBoundsWeight = value; } }
+
 
     protected override void CalcSteeringForces()
     {
-        Vector2 force = Seek(target) * seekerWeight;
+        Vector2 totalForce = Vector2.zero;
 
-        Vector2.ClampMagnitude(force, MaxForce);
+        totalForce += Seek(target) * seekerWeight;
+        totalForce += StayInBounds() * stayInBoundsWeight;
 
-        ApplyForce(force);
+        Vector2.ClampMagnitude(totalForce, MaxForce);
+
+        ApplyForce(totalForce);
     }
 }

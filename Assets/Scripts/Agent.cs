@@ -5,12 +5,14 @@ using UnityEngine;
 public abstract class Agent : MonoBehaviour
 {
     #region Force Weights
-    protected float seekerWeight;
+    protected float seekerWeight, stayInBoundsWeight;
     #endregion
     #region Bound Variables
     protected float futureTime, radius;
+    public float FutureTime { set { futureTime = value; } }
     public float Radius { get { return radius; } }
     protected Bounds agentBounds;
+    public Bounds WallBounds { get; set; }
     #endregion
     #region Stat Variables
     protected float mass, maxSpeed;
@@ -74,6 +76,26 @@ public abstract class Agent : MonoBehaviour
 
         return seekingForce;
     }
+
+    protected Vector2 StayInBounds()
+    {
+        float wallMinX = WallBounds.min.x;
+        float wallMaxX = WallBounds.max.x;
+        float wallMinY = WallBounds.min.y;
+        float wallMaxY = WallBounds.max.y;
+
+        Vector2 futurePosition = position + velocity * futureTime;
+
+        bool left = futurePosition.x < wallMinX;
+        bool right = futurePosition.x > wallMaxX;
+        bool up = futurePosition.y > wallMaxY;
+        bool down = futurePosition.y < wallMinY;
+
+        if (left || right || up || down)
+            return Seek(Vector2.zero);
+        
+        return Vector2.zero;
+    }
     protected void ApplyForce(Vector2 force)
     {
         acceleration += force / mass;
@@ -88,11 +110,19 @@ public abstract class Agent : MonoBehaviour
     {
         seekerWeight = weight;
     }
-
-    public void SetPosition(Vector2 position) 
+    #endregion
+    public void SetPosition(Vector2 position)
     {
         transform.position = position;
         this.position = position;
     }
-    #endregion
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.magenta;
+        
+        //draw future position
+        Gizmos.DrawLine(position, position + velocity * futureTime);
+        Gizmos.DrawWireSphere(position + velocity * futureTime, Radius);
+    }
 }

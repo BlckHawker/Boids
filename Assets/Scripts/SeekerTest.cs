@@ -35,15 +35,15 @@ public class SeekerTest : MonoBehaviour
     #region Agent Stats
     [SerializeField]
     [Range(0f, 10f)]
-    private float futureTime;
+    public float futureTime;
     [SerializeField]
     [Range(1f,10f)]
-    private float mass, maxForce, maxSpeed;
+    public float mass, maxForce, maxSpeed;
     #endregion
     #region Force Weight
     [Range(1, 10)]
     [SerializeField]
-    private float seekerWeight, stayInBoundsWeight;
+    public float seekerWeight, stayInBoundsWeight;
     #endregion
 
     #region Screen Position

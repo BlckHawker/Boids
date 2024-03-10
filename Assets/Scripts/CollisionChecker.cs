@@ -43,12 +43,11 @@ public class CollisionChecker : MonoBehaviour
 
     public bool CircleCollision(Vector2 objPosition1, float objRadius1, Vector2 objPosition2, float objRadius2)
     {
-        float dististanceSquared = Mathf.Pow(objPosition1.x - objPosition2.x, 2) +
-                                   Mathf.Pow(objPosition1.y - objPosition2.y, 2);
+        float distance = Vector2.Distance(objPosition1, objPosition2);
 
-        float radiusSum = Mathf.Pow(objRadius1 + objRadius2, 2);
+        float radiusSum = objRadius1 + objRadius2;
 
-        bool colliding = dististanceSquared < radiusSum;
+        bool colliding = distance < radiusSum;
 
         //Debug.Log($"Distance: {dististanceSquared} | Radius Sum: {radiusSum} | Colliding {colliding}");
         return colliding;

@@ -1,14 +1,11 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using Rnd = UnityEngine.Random;
 
-/// <summary>
-/// Seeker and dummy object spawn at a random position on screen.
-/// Seeker moves towards dummy object. Once both collide, dummy 
-/// object will move to another random position.
-/// </summary>
-public class SeekerTest : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
     private enum SceneChecker
     {
@@ -33,16 +30,11 @@ public class SeekerTest : MonoBehaviour
     #endregion
 
     #region Agent Stats
-    [SerializeField]
-    [Range(0f, 10f)]
-    public float futureTime;
-    [SerializeField]
-    [Range(1f,10f)]
-    public float mass, maxForce, maxSpeed;
+    [NonSerialized]
+    public float futureTime, mass, maxForce, maxSpeed;
     #endregion
     #region Force Weight
-    [Range(1, 10)]
-    [SerializeField]
+    [NonSerialized]
     public float seekerWeight, stayInBoundsWeight;
     #endregion
 
@@ -55,39 +47,43 @@ public class SeekerTest : MonoBehaviour
     {
         float height = 2f * camera.orthographicSize;
         float width = height * camera.aspect;
+        if (sceneChecker == SceneChecker.SeekerTest)
+        {
+            dummy = Instantiate(dumbPrefab);
+            dummy.transform.position = GetRandomPosition();
 
-        dummy = Instantiate(dumbPrefab);
-        dummy.transform.position = GetRandomPosition();
+            seeker = Instantiate(seekerPrefab).gameObject;
+            seeker.transform.position = GetRandomPosition();
+            seekerComponent = seeker.GetComponent<Seeker>();
+            seekerComponent.Target = dummy;
+            seekerComponent.WallBounds = new Bounds(Vector2.zero, new Vector2(width, height));
 
-        seeker = Instantiate(seekerPrefab).gameObject;
-        seeker.transform.position = GetRandomPosition();
-        seekerComponent = seeker.GetComponent<Seeker>();
-        seekerComponent.Target = dummy;
-        seekerComponent.WallBounds = new Bounds(Vector2.zero, new Vector2(width, height));
-        UpdateValues();
-        
-        collisionChecker.SetSceneChecker((int)sceneChecker);
-        collisionChecker.SetDummyObject(dummy);
-        collisionChecker.SetSeeker(seekerComponent);
+            collisionChecker.SetSceneChecker((int)sceneChecker);
+            collisionChecker.SetDummyObject(dummy);
+            collisionChecker.SetSeeker(seekerComponent);
+        }
     }
 
     void Update()
     {
         if (collisionChecker.CircleCollision())
             dummy.transform.position = GetRandomPosition();
+
         UpdateValues();
     }
 
     private void UpdateValues()
     {
-        seekerComponent.Mass = mass;
-        seekerComponent.MaxForce = maxForce;
-        seekerComponent.SeekerWeight = seekerWeight;
-        seekerComponent.MaxSpeed = maxSpeed;
-        seekerComponent.StayInBoundsWeight = stayInBoundsWeight;
-        seekerComponent.FutureTime = futureTime;
+        if (sceneChecker == SceneChecker.SeekerTest)
+        {
+            seekerComponent.FutureTime = futureTime;
+            seekerComponent.Mass = mass;
+            seekerComponent.MaxForce = maxForce;
+            seekerComponent.MaxSpeed = maxSpeed;
+            seekerComponent.SeekerWeight = seekerWeight;
+            seekerComponent.StayInBoundsWeight = stayInBoundsWeight;
+        }
     }
-
     private Vector3 GetRandomPosition()
     {
         Vector3 pos = camera.ScreenToWorldPoint(new Vector3(Rnd.Range(0, camera.pixelWidth), Rnd.Range(0, camera.pixelHeight)));
@@ -100,7 +96,8 @@ public class SeekerTest : MonoBehaviour
         if (Application.isPlaying)
         {
             Gizmos.color = Color.green;
-            Gizmos.DrawWireCube(seekerComponent.WallBounds.center, seekerComponent.WallBounds.size);
+            if (sceneChecker == SceneChecker.SeekerTest)
+                Gizmos.DrawWireCube(seekerComponent.WallBounds.center, seekerComponent.WallBounds.size);
         }
     }
 }

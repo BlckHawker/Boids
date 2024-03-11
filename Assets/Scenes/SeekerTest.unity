@@ -750,8 +750,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 446733227}
-  - component: {fileID: 446733226}
   - component: {fileID: 446733228}
+  - component: {fileID: 446733229}
   m_Layer: 0
   m_Name: GameMananger
   m_TagString: Untagged
@@ -759,29 +759,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &446733226
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 446733225}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b86a50844023c0a41a3d5b4c27feef21, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  sceneChecker: 0
-  collisionChecker: {fileID: 1421870917}
-  dumbPrefab: {fileID: 4286302130894826189, guid: dc846b175f3d7384890537b430418aa3, type: 3}
-  seekerPrefab: {fileID: 8160406667041693798, guid: e874ffa99319ae04f9c17703c17a9d65, type: 3}
-  futureTime: 0
-  mass: 1
-  maxForce: 1
-  maxSpeed: 1
-  seekerWeight: 1
-  stayInBoundsWeight: 1
-  camera: {fileID: 519420031}
 --- !u!4 &446733227
 Transform:
   m_ObjectHideFlags: 0
@@ -809,7 +786,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b3bfd3aab811ce4095017bb0e799b6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sceneChecker: 0
   canvasGameObject: {fileID: 1164339323}
+  defaultFutureTime: 6
+  defaultMass: 0
+  defaultMaxForce: 7
+  defaultMaxSpeed: 10
+  defaultSeekerWeight: 10
+  defaultStayInBound: 0
+--- !u!114 &446733229
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 446733225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d31c34ba233c644c890280b0c662326, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneChecker: 0
+  collisionChecker: {fileID: 1421870917}
+  dumbPrefab: {fileID: 4286302130894826189, guid: dc846b175f3d7384890537b430418aa3, type: 3}
+  seekerPrefab: {fileID: 8160406667041693798, guid: e874ffa99319ae04f9c17703c17a9d65, type: 3}
+  futureTime: 0
+  mass: 0
+  maxForce: 0
+  maxSpeed: 0
+  seekerWeight: 0
+  stayInBoundsWeight: 0
+  camera: {fileID: 519420031}
 --- !u!1 &461286744
 GameObject:
   m_ObjectHideFlags: 0

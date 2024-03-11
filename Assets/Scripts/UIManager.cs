@@ -6,53 +6,67 @@ using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
+using static UnityEditor.ShaderData;
 
 public class UIManager : MonoBehaviour
 {
     // Start is called before the first frame update
 
+    private enum SceneChecker
+    {
+        SeekerTest,
+        FleerTest
+    }
+
+    [SerializeField]
+    private SceneChecker sceneChecker;
     [SerializeField]
     private GameObject canvasGameObject;
     private (Slider, TextMeshProUGUI) futureTimeTuple, massTuple, maxForceTuple, maxSpeedTuple, seekerWeightTuple, stayInBoundTuple;
-    private SeekerTest gameManagerScript;
+    [SerializeField]
+    [Range(1, 10)]
+    private int defaultFutureTime, defaultMass, defaultMaxForce, defaultMaxSpeed, defaultSeekerWeight, defaultStayInBound;
+    private GameManager gameManagerScript;
+
     void Start()
     {
-        Transform panelTransform = canvasGameObject.transform.Find("Panel");
-        futureTimeTuple = GetStatTuple(panelTransform, "Future Time");
-        massTuple = GetStatTuple(panelTransform, "Mass");
-        maxForceTuple = GetStatTuple(panelTransform, "Max Force");
-        maxSpeedTuple = GetStatTuple(panelTransform, "Max Speed");
-        seekerWeightTuple = GetStatTuple(panelTransform, "Seeker Weight");
-        stayInBoundTuple = GetStatTuple(panelTransform, "Stay in Bounds Weight");
-
-        gameManagerScript = GetComponent<SeekerTest>();
-        //Debug.Log("a");
+        if(sceneChecker == SceneChecker.SeekerTest)
+        {
+            Transform panelTransform = canvasGameObject.transform.Find("Panel");
+            futureTimeTuple = GetStatTuple(panelTransform, "Future Time", defaultFutureTime);
+            massTuple = GetStatTuple(panelTransform, "Mass", defaultMass);
+            maxForceTuple = GetStatTuple(panelTransform, "Max Force", defaultMaxForce);
+            maxSpeedTuple = GetStatTuple(panelTransform, "Max Speed", defaultMaxSpeed);
+            seekerWeightTuple = GetStatTuple(panelTransform, "Seeker Weight", defaultSeekerWeight);
+            stayInBoundTuple = GetStatTuple(panelTransform, "Stay in Bounds Weight", defaultStayInBound);
+            gameManagerScript = GetComponent<GameManager>();
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        gameManagerScript.futureTime = UpdateStats(futureTimeTuple);
-        gameManagerScript.mass = UpdateStats(massTuple);
-        gameManagerScript.maxForce = UpdateStats(maxForceTuple);
-        gameManagerScript.maxSpeed = UpdateStats(maxSpeedTuple);
-        gameManagerScript.seekerWeight = UpdateStats(seekerWeightTuple);
-        gameManagerScript.stayInBoundsWeight = UpdateStats(stayInBoundTuple);
-
-        Debug.Log("Future Time: " + gameManagerScript.futureTime);
+        if (sceneChecker == SceneChecker.SeekerTest)
+        {
+            gameManagerScript.futureTime = UpdateStats(futureTimeTuple);
+            gameManagerScript.mass = UpdateStats(massTuple);
+            gameManagerScript.maxForce = UpdateStats(maxForceTuple);
+            gameManagerScript.maxSpeed = UpdateStats(maxSpeedTuple);
+            gameManagerScript.seekerWeight = UpdateStats(seekerWeightTuple);
+            gameManagerScript.stayInBoundsWeight = UpdateStats(stayInBoundTuple);
+        }
     }
-
-    private (Slider,TextMeshProUGUI) GetStatTuple(Transform transform, string parentName)
+    private (Slider,TextMeshProUGUI) GetStatTuple(Transform transform, string parentName, float initialValue)
     {
         Transform parent = transform.Find(parentName);
         Slider slider = parent.Find("Slider").GetComponent<Slider>();
         slider.minValue = 1;
         slider.maxValue = 10;
         slider.wholeNumbers = true;
+        slider.value = initialValue;
         TextMeshProUGUI text = parent.Find("Stat").GetComponent<TextMeshProUGUI>();
         return (slider, text);
     }
-
     private float UpdateStats((Slider, TextMeshProUGUI) tuple)
     {
 

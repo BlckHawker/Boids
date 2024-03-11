@@ -37,6 +37,10 @@ public abstract class Agent : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //if mass is 0, don't run update
+        if (mass == 0)
+            return;
+        
         //reset acceleration
         acceleration = Vector2.zero;
         CalcSteeringForces();

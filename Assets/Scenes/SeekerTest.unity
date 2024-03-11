@@ -788,12 +788,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   sceneChecker: 0
   canvasGameObject: {fileID: 1164339323}
-  defaultFutureTime: 6
-  defaultMass: 0
-  defaultMaxForce: 7
-  defaultMaxSpeed: 10
+  defaultSeekerFutureTime: 6
+  defaultSeekerMass: 0
+  defaultSeekerMaxForce: 7
+  defaultSeekerMaxSpeed: 10
   defaultSeekerWeight: 10
-  defaultStayInBound: 0
+  defaultSeekerStayInBound: 0
+  defaultFleerFutureTime: 6
+  defaultFleerMass: 0
+  defaultFleerMaxForce: 7
+  defaultFleerMaxSpeed: 10
+  defaultFleerWeight: 10
+  defaultFleerStayInBound: 0
 --- !u!114 &446733229
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -810,12 +816,6 @@ MonoBehaviour:
   collisionChecker: {fileID: 1421870917}
   dumbPrefab: {fileID: 4286302130894826189, guid: dc846b175f3d7384890537b430418aa3, type: 3}
   seekerPrefab: {fileID: 8160406667041693798, guid: e874ffa99319ae04f9c17703c17a9d65, type: 3}
-  futureTime: 0
-  mass: 0
-  maxForce: 0
-  maxSpeed: 0
-  seekerWeight: 0
-  stayInBoundsWeight: 0
   camera: {fileID: 519420031}
 --- !u!1 &461286744
 GameObject:

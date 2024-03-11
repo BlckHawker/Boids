@@ -6,7 +6,7 @@ public class Seeker : Agent
 {
     private GameObject target;
     public GameObject Target { set { target = value; } }
-    public float SeekerWeight { set { seekerWeight = value; } }
+    public float SeekWeight { set { seekerWeight = value; } }
     public float StayInBoundsWeight { set { stayInBoundsWeight = value; } }
 
 

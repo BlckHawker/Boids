@@ -1,7 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using Rnd = UnityEngine.Random;
 
@@ -9,7 +6,8 @@ public class GameManager : MonoBehaviour
 {
     private enum SceneChecker
     {
-        SeekerTest
+        SeekerTest,
+        FleerTest
     }
 
     [SerializeField]
@@ -25,17 +23,19 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Seeker seekerPrefab;
 
-    private GameObject dummy, seeker;
+    [SerializeField]
+    private Fleer fleerPrefab;
+
+    private GameObject dummy, seeker, fleer;
     private Seeker seekerComponent;
+    private Fleer fleerComponent;
     #endregion
 
     #region Agent Stats
     [NonSerialized]
-    public float futureTime, mass, maxForce, maxSpeed;
-    #endregion
-    #region Force Weight
+    public float seekerFutureTime, seekerMass, seekerMaxForce, seekerMaxSpeed, seekerWeight, seekerStayInBoundsWeight;
     [NonSerialized]
-    public float seekerWeight, stayInBoundsWeight;
+    public float fleerFutureTime, fleerMass, fleerMaxForce, fleerMaxSpeed, fleerWeight, fleerStayInBoundsWeight;
     #endregion
 
     #region Screen Position
@@ -62,11 +62,26 @@ public class GameManager : MonoBehaviour
             collisionChecker.SetDummyObject(dummy);
             collisionChecker.SetSeeker(seekerComponent);
         }
-    }
 
+        else if (sceneChecker == SceneChecker.FleerTest)
+        {
+            fleer = Instantiate(fleerPrefab).gameObject;
+            seeker = Instantiate(seekerPrefab).gameObject;
+
+            seekerComponent = seeker.GetComponent<Seeker>();
+            seekerComponent.Position = GetRandomPosition();
+            seekerComponent.Target = fleer;
+            seekerComponent.WallBounds = new Bounds(Vector2.zero, new Vector2(width, height));
+
+            fleerComponent = fleer.GetComponent<Fleer>();
+            fleerComponent.Position = GetRandomPosition();
+            fleerComponent.Target = seeker;
+            fleerComponent.WallBounds = new Bounds(Vector2.zero, new Vector2(width, height));
+        }
+    }
     void Update()
     {
-        if (collisionChecker.CircleCollision())
+        if (sceneChecker == SceneChecker.SeekerTest && collisionChecker.CircleCollision())
             dummy.transform.position = GetRandomPosition();
 
         UpdateValues();
@@ -76,13 +91,32 @@ public class GameManager : MonoBehaviour
     {
         if (sceneChecker == SceneChecker.SeekerTest)
         {
-            seekerComponent.FutureTime = futureTime;
-            seekerComponent.Mass = mass;
-            seekerComponent.MaxForce = maxForce;
-            seekerComponent.MaxSpeed = maxSpeed;
-            seekerComponent.SeekerWeight = seekerWeight;
-            seekerComponent.StayInBoundsWeight = stayInBoundsWeight;
+            UpdateSeekerValues();
         }
+
+        else if (sceneChecker == SceneChecker.FleerTest)
+        {
+            UpdateSeekerValues();
+            UpdateFleerValues();
+        }
+    }
+    private void UpdateSeekerValues()
+    {
+        seekerComponent.FutureTime = seekerFutureTime;
+        seekerComponent.Mass = seekerMass;
+        seekerComponent.MaxForce = seekerMaxForce;
+        seekerComponent.MaxSpeed = seekerMaxSpeed;
+        seekerComponent.SeekWeight = seekerWeight;
+        seekerComponent.StayInBoundsWeight = seekerStayInBoundsWeight;
+    }
+    private void UpdateFleerValues()
+    {
+        fleerComponent.FutureTime = fleerFutureTime;
+        fleerComponent.Mass = fleerMass;
+        fleerComponent.MaxForce = fleerMaxForce;
+        fleerComponent.MaxSpeed = fleerMaxSpeed;
+        fleerComponent.FleeWeight = fleerWeight;
+        fleerComponent.StayInBoundsWeight = fleerStayInBoundsWeight;
     }
     private Vector3 GetRandomPosition()
     {
@@ -90,7 +124,6 @@ public class GameManager : MonoBehaviour
         pos.z = 0;
         return pos;
     }
-
     private void OnDrawGizmos()
     {
         if (Application.isPlaying)

@@ -5,7 +5,7 @@ using UnityEngine;
 public abstract class Agent : MonoBehaviour
 {
     #region Force Weights
-    protected float seekerWeight, stayInBoundsWeight;
+    protected float seekerWeight, fleerWeight, stayInBoundsWeight;
     #endregion
     #region Bound Variables
     protected float futureTime, radius;
@@ -21,15 +21,15 @@ public abstract class Agent : MonoBehaviour
     public float MaxSpeed { set { maxSpeed = value; } }
     #endregion
     #region Other Variables
-    protected Vector2 position, velocity, acceleration;
-    public Vector2 Position { get { return position; } }
+    protected Vector2 velocity, acceleration;
+    public Vector2 Position;
     #endregion
     // Start is called before the first frame update
     void Start()
     {
         radius = transform.localScale.x / 2;
         agentBounds = new Bounds(transform.position, new(radius, radius));
-        transform.position = position;
+        transform.position = Position;
         velocity = Vector2.zero;
         acceleration = Vector2.zero;
     }
@@ -39,8 +39,12 @@ public abstract class Agent : MonoBehaviour
     {
         //if mass is 0, don't run update
         if (mass == 0)
+        {
+            Debug.Log("Mass is 0 for " + gameObject.name);
             return;
-        
+        }
+
+
         //reset acceleration
         acceleration = Vector2.zero;
         CalcSteeringForces();
@@ -54,9 +58,9 @@ public abstract class Agent : MonoBehaviour
         RotateVehicle();
 
         //udpate vehicle position
-        position += velocity * Time.deltaTime;
+        Position += velocity * Time.deltaTime;
 
-        transform.position = position;
+        transform.position = Position;
     }
 
     private void RotateVehicle()
@@ -70,7 +74,7 @@ public abstract class Agent : MonoBehaviour
     protected Vector2 Seek(Vector2 targetPos)
     {
         //calculate desired veolcity
-        Vector2 desiredVelocity = targetPos - position;
+        Vector2 desiredVelocity = targetPos - Position;
 
         //scale desired velocity to max speed
         desiredVelocity = desiredVelocity.normalized * maxSpeed;
@@ -80,7 +84,27 @@ public abstract class Agent : MonoBehaviour
 
         return seekingForce;
     }
+    protected Vector2 Seek(GameObject target)
+    {
+        return Seek(target.transform.position);
+    }
+    protected Vector2 Flee(Vector2 targetPos)
+    {
+        //calculate desired veolcity
+        Vector2 desiredVelocity = Position - targetPos;
 
+        //scale desired velocity to max speed
+        desiredVelocity = desiredVelocity.normalized * maxSpeed;
+
+        //find the steering force
+        Vector2 fleeingForce = desiredVelocity - velocity;
+
+        return fleeingForce;
+    }
+    protected Vector2 Flee(GameObject target)
+    {
+        return Flee(target.transform.position);
+    }
     protected Vector2 StayInBounds()
     {
         float wallMinX = WallBounds.min.x;
@@ -88,7 +112,7 @@ public abstract class Agent : MonoBehaviour
         float wallMinY = WallBounds.min.y;
         float wallMaxY = WallBounds.max.y;
 
-        Vector2 futurePosition = position + velocity * futureTime;
+        Vector2 futurePosition = Position + velocity * futureTime;
 
         bool left = futurePosition.x < wallMinX;
         bool right = futurePosition.x > wallMaxX;
@@ -104,29 +128,14 @@ public abstract class Agent : MonoBehaviour
     {
         acceleration += force / mass;
     }
-    protected Vector2 Seek(GameObject target)
-    {
-        return Seek(target.transform.position);
-    }
     #endregion
-    #region Weight Setter Methods
-    public void SetSeekerForce(float weight)
-    {
-        seekerWeight = weight;
-    }
-    #endregion
-    public void SetPosition(Vector2 position)
-    {
-        transform.position = position;
-        this.position = position;
-    }
 
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.magenta;
         
         //draw future position
-        Gizmos.DrawLine(position, position + velocity * futureTime);
-        Gizmos.DrawWireSphere(position + velocity * futureTime, Radius);
+        Gizmos.DrawLine(Position, Position + velocity * futureTime);
+        Gizmos.DrawWireSphere(Position + velocity * futureTime, Radius);
     }
 }

@@ -4841,15 +4841,15 @@ MonoBehaviour:
   defaultFleerMaxSpeed: 10
   defaultFleerWeight: 10
   defaultFleerStayInBound: 0
-  defaultWandererFutureTime: 0
+  defaultWandererFutureTime: 7
   defaultWandererMass: 0
   defaultWandererMaxForce: 0
   defaultWandererMaxSpeed: 0
-  defaultWandererStayInBoundsWeight: 0
+  defaultWandererStayInBoundsWeight: 10
   defaultWandererWanderWeight: 0
-  defaultWandererWanderOffset: 0
+  defaultWandererWanderCircleRadius: 3
+  defaultWandererWanderOffset: 10
   defaultWandererWanderTime: 0
-  defaultWandererWanderCircleRadius: 5
 --- !u!4 &1675351015
 Transform:
   m_ObjectHideFlags: 0

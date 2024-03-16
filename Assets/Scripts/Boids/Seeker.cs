@@ -13,7 +13,7 @@ public class Seeker : Agent
         totalForce += Seek(target) * seekWeight;
         totalForce += StayInBounds() * stayInBoundsWeight;
 
-        Vector2.ClampMagnitude(totalForce, MaxForce);
+        totalForce = Vector2.ClampMagnitude(totalForce, MaxForce);
 
         ApplyForce(totalForce);
     }

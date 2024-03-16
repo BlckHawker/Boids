@@ -11,7 +11,7 @@ public class Wanderer : Agent
 
         totalForce += StayInBounds() * stayInBoundsWeight;
         totalForce += Wander() * wanderWeight;
-        Vector2.ClampMagnitude(totalForce, MaxForce);
+        totalForce = Vector2.ClampMagnitude(totalForce, MaxForce);
         ApplyForce(totalForce);
     }
 }

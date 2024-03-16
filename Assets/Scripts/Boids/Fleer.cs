@@ -13,7 +13,7 @@ public class Fleer : Agent
         totalForce += Flee(target) * fleerWeight;
         totalForce += StayInBounds() * stayInBoundsWeight;
 
-        Vector2.ClampMagnitude(totalForce, MaxForce);
+        totalForce = Vector2.ClampMagnitude(totalForce, MaxForce);
         ApplyForce(totalForce);
     }
 }

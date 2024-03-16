@@ -12,7 +12,8 @@ public class UIManager : MonoBehaviour
     private enum SceneChecker
     {
         SeekerTest,
-        FleerTest
+        FleerTest,
+        WandererTest,
     }
 
     [SerializeField]
@@ -21,7 +22,7 @@ public class UIManager : MonoBehaviour
     private GameObject canvasGameObject;
     private (Slider, Text) seekerFutureTimeTuple, seekerMassTuple, seekerMaxForceTuple, seekerMaxSpeedTuple, seekerWeightTuple, seekerStayInBoundTuple;
     private (Slider, Text) fleerFutureTimeTuple, fleerMassTuple, fleerMaxForceTuple, fleerMaxSpeedTuple, fleerWeightTuple, fleerStayInBoundTuple;
-
+    private (Slider, Text) wandererFutureTimeTuple, wandererMassTuple, wandererMaxForceTuple, wandererMaxSpeedTuple, wandererStayInBoundsWeightTuple, wandererWanderWeightTuple, wandererWanderCircleRadiusTuple, wandererWanderOffsetTuple, wandererWanderTimeTuple;
 
     #region Seeker Values
     [Header("Seeker Values")]
@@ -29,19 +30,7 @@ public class UIManager : MonoBehaviour
     private int defaultSeekerFutureTime;
 
     [SerializeField, Range(1, 10)]
-    private int defaultSeekerMass;
-
-    [SerializeField, Range(1, 10)]
-    private int defaultSeekerMaxForce;
-
-    [SerializeField, Range(1, 10)] 
-    private int defaultSeekerMaxSpeed;
-
-    [SerializeField, Range(1, 10)] 
-    private int defaultSeekerWeight;
-
-    [SerializeField, Range(1, 10)] 
-    private int defaultSeekerStayInBound;
+    private int defaultSeekerMass, defaultSeekerMaxForce, defaultSeekerMaxSpeed, defaultSeekerWeight, defaultSeekerStayInBound;
     #endregion
 
     #region Fleer Values
@@ -50,19 +39,29 @@ public class UIManager : MonoBehaviour
     private int defaultFleerFutureTime;
 
     [SerializeField, Range(1, 10)]
-    private int defaultFleerMass;
+    private int defaultFleerMass, defaultFleerMaxForce, defaultFleerMaxSpeed, defaultFleerWeight, defaultFleerStayInBound;
+    #endregion
 
+    #region Wanderer Values
+    [Header("Wanderer Values")]
     [SerializeField, Range(1, 10)]
-    private int defaultFleerMaxForce;
-
+    private int defaultWandererFutureTime;
     [SerializeField, Range(1, 10)]
-    private int defaultFleerMaxSpeed;
-
+    private int defaultWandererMass;
     [SerializeField, Range(1, 10)]
-    private int defaultFleerWeight;
-
+    private int defaultWandererMaxForce;
     [SerializeField, Range(1, 10)]
-    private int defaultFleerStayInBound;
+    private int defaultWandererMaxSpeed;
+    [SerializeField, Range(1, 10)]
+    private int defaultWandererStayInBoundsWeight;
+    [SerializeField, Range(1, 10)]
+    private int defaultWandererWanderWeight;
+    [SerializeField, Range(1, 20)]
+    private int defaultWandererWanderCircleRadius;
+    [SerializeField, Range(1, 100)]
+    private int defaultWandererWanderOffset;
+    [SerializeField, Range(1, 10)]
+    private int defaultWandererWanderTime;
     #endregion
 
     private GameManager gameManagerScript;
@@ -73,10 +72,11 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         gameManagerScript = GetComponent<GameManager>();
+        Transform contentTransform = null;
         switch (sceneChecker)
         {
             case SceneChecker.SeekerTest:
-                Transform contentTransform = canvasGameObject.transform.Find("Panel").Find("Scroll Area").Find("Content");
+                contentTransform = canvasGameObject.transform.Find("Panel").Find("Scroll Area").Find("Content");
                 seekerFutureTimeTuple = GetStatTuple(contentTransform, "Future Time", defaultSeekerFutureTime);
                 seekerMassTuple = GetStatTuple(contentTransform, "Mass", defaultSeekerMass);
                 seekerMaxForceTuple = GetStatTuple(contentTransform, "Max Force", defaultSeekerMaxForce);
@@ -112,6 +112,26 @@ public class UIManager : MonoBehaviour
                 fleerStayInBoundTuple = GetStatTuple(fleePanelContent, "Stay in Bounds Weight", defaultFleerStayInBound);
                 ShowSeekPanel();
                 break;
+            case SceneChecker.WandererTest:
+                contentTransform = canvasGameObject.transform.Find("Panel").Find("Scroll Area").Find("Content");
+
+                wandererFutureTimeTuple = GetStatTuple(contentTransform, "Future Time", defaultWandererFutureTime);
+                wandererMassTuple = GetStatTuple(contentTransform, "Mass", defaultWandererMass);
+                wandererMaxForceTuple = GetStatTuple(contentTransform, "Max Force", defaultWandererMaxForce);
+                wandererMaxSpeedTuple = GetStatTuple(contentTransform, "Max Speed", defaultWandererMaxSpeed);
+                wandererStayInBoundsWeightTuple = GetStatTuple(contentTransform, "Stay in Bounds Weight", defaultWandererStayInBoundsWeight);
+                wandererWanderWeightTuple = GetStatTuple(contentTransform, "Wander Weight", defaultWandererWanderWeight);
+                wandererWanderCircleRadiusTuple = GetStatTuple(contentTransform, "Wander Circle Radius", defaultWandererWanderCircleRadius);
+                wandererWanderOffsetTuple = GetStatTuple(contentTransform, "Wander Offset", defaultWandererWanderOffset);
+                wandererWanderTimeTuple = GetStatTuple(contentTransform, "Wander Time", defaultWandererWanderTime);
+
+                //manually setting the ranges for certain sliders
+                UpdateSliderRange(wandererWanderCircleRadiusTuple.Item1, 1, 5);
+                UpdateSliderRange(wandererWanderOffsetTuple.Item1, 1, 100);
+
+
+                break;
+
         }
     }
 
@@ -128,6 +148,10 @@ public class UIManager : MonoBehaviour
                 UpdateSeekerStats();
                 UpdateFleerStats();
                 break;
+
+            case SceneChecker.WandererTest:
+                UpdateWandererStats();
+                break;
         }
     }
     private (Slider, Text) GetStatTuple(Transform transform, string parentName, float initialValue)
@@ -140,6 +164,12 @@ public class UIManager : MonoBehaviour
         slider.value = initialValue;
         Text text = parent.Find("Stat").GetComponent<Text>();
         return (slider, text);
+    }
+
+    private void UpdateSliderRange(Slider slider, int min, int max)
+    {
+        slider.minValue = min;
+        slider.maxValue = max;
     }
     private float UpdateStats((Slider, Text) tuple)
     {
@@ -162,9 +192,21 @@ public class UIManager : MonoBehaviour
         gameManagerScript.fleerFutureTime = UpdateStats(fleerFutureTimeTuple);
         gameManagerScript.fleerMass = UpdateStats(fleerMassTuple);
         gameManagerScript.fleerMaxForce = UpdateStats(fleerMaxForceTuple);
-        gameManagerScript.fleerMaxSpeed = UpdateStats(fleerMaxForceTuple);
+        gameManagerScript.fleerMaxSpeed = UpdateStats(fleerMaxSpeedTuple);
         gameManagerScript.fleerWeight = UpdateStats(fleerWeightTuple);
         gameManagerScript.fleerStayInBoundsWeight = UpdateStats(fleerStayInBoundTuple);
+    }
+    private void UpdateWandererStats()
+    {
+        gameManagerScript.wandererFutureTime = UpdateStats(wandererFutureTimeTuple);
+        gameManagerScript.wandererMass = UpdateStats(wandererMassTuple);
+        gameManagerScript.wandererMaxForce = UpdateStats(wandererMaxForceTuple);
+        gameManagerScript.wandererMaxSpeed = UpdateStats(wandererMaxSpeedTuple);
+        gameManagerScript.wandererStayInBoundsWeight = UpdateStats(wandererStayInBoundsWeightTuple);
+        gameManagerScript.wandererWanderWeight = UpdateStats(wandererWanderWeightTuple);
+        gameManagerScript.wandererWanderCircleRadius = UpdateStats(wandererWanderCircleRadiusTuple);
+        gameManagerScript.wandererWanderOffset = UpdateStats(wandererWanderOffsetTuple);
+        gameManagerScript.wandererWanderTime = UpdateStats(wandererWanderTimeTuple);
     }
     public void ShowSeekPanel()
     {

@@ -7,7 +7,8 @@ public class GameManager : MonoBehaviour
     private enum SceneChecker
     {
         SeekerTest,
-        FleerTest
+        FleerTest,
+        WandererTest
     }
 
     [SerializeField]
@@ -26,9 +27,14 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Fleer fleerPrefab;
 
-    private GameObject dummy, seeker, fleer;
+    [SerializeField]
+    private Wanderer wandererPrefab;
+
+    private GameObject dummy;
+    private Agent seeker, fleer, wanderer;
     private Seeker seekerComponent;
     private Fleer fleerComponent;
+    private Wanderer wandererComponent;
     #endregion
 
     #region Agent Stats
@@ -36,6 +42,8 @@ public class GameManager : MonoBehaviour
     public float seekerFutureTime, seekerMass, seekerMaxForce, seekerMaxSpeed, seekerWeight, seekerStayInBoundsWeight;
     [NonSerialized]
     public float fleerFutureTime, fleerMass, fleerMaxForce, fleerMaxSpeed, fleerWeight, fleerStayInBoundsWeight;
+    [NonSerialized]
+    public float wandererFutureTime, wandererMass, wandererMaxForce, wandererMaxSpeed, wandererStayInBoundsWeight, wandererWanderWeight, wandererWanderCircleRadius, wandererWanderOffset, wandererWanderTime;
     #endregion
 
     #region Screen Position
@@ -45,18 +53,17 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        float height = 2f * camera.orthographicSize;
-        float width = height * camera.aspect;
+        Bounds wallBounds = UpdateAgentWallBounds();
         if (sceneChecker == SceneChecker.SeekerTest)
         {
             dummy = Instantiate(dumbPrefab);
             dummy.transform.position = GetRandomPosition();
 
-            seeker = Instantiate(seekerPrefab).gameObject;
+            seeker = Instantiate(seekerPrefab);
             seeker.transform.position = GetRandomPosition();
             seekerComponent = seeker.GetComponent<Seeker>();
             seekerComponent.Target = dummy;
-            seekerComponent.WallBounds = new Bounds(Vector2.zero, new Vector2(width, height));
+            seekerComponent.WallBounds = wallBounds;
 
             collisionChecker.SetSceneChecker((int)sceneChecker);
             collisionChecker.SetDummyObject(dummy);
@@ -65,18 +72,25 @@ public class GameManager : MonoBehaviour
 
         else if (sceneChecker == SceneChecker.FleerTest)
         {
-            fleer = Instantiate(fleerPrefab).gameObject;
-            seeker = Instantiate(seekerPrefab).gameObject;
+            fleer = Instantiate(fleerPrefab);
+            seeker = Instantiate(seekerPrefab);
 
             seekerComponent = seeker.GetComponent<Seeker>();
             seekerComponent.Position = GetRandomPosition();
-            seekerComponent.Target = fleer;
-            seekerComponent.WallBounds = new Bounds(Vector2.zero, new Vector2(width, height));
+            seekerComponent.Target = fleer.gameObject;
+            seekerComponent.WallBounds = wallBounds;
 
             fleerComponent = fleer.GetComponent<Fleer>();
             fleerComponent.Position = GetRandomPosition();
-            fleerComponent.Target = seeker;
-            fleerComponent.WallBounds = new Bounds(Vector2.zero, new Vector2(width, height));
+            fleerComponent.Target = seeker.gameObject;
+            fleerComponent.WallBounds = wallBounds;
+        }
+
+        else if (sceneChecker == SceneChecker.WandererTest)
+        {
+            wanderer = Instantiate(wandererPrefab);
+            wandererComponent = wanderer.GetComponent<Wanderer>();
+            wandererComponent.WallBounds = wallBounds;
         }
     }
     void Update()
@@ -99,6 +113,11 @@ public class GameManager : MonoBehaviour
             UpdateSeekerValues();
             UpdateFleerValues();
         }
+
+        else if(sceneChecker == SceneChecker.WandererTest) 
+        {
+            UpdateWandererValues();
+        }
     }
     private void UpdateSeekerValues()
     {
@@ -118,6 +137,18 @@ public class GameManager : MonoBehaviour
         fleerComponent.FleeWeight = fleerWeight;
         fleerComponent.StayInBoundsWeight = fleerStayInBoundsWeight;
     }
+    private void UpdateWandererValues()
+    {
+        wandererComponent.FutureTime = wandererFutureTime;
+        wandererComponent.Mass = wandererMass;
+        wandererComponent.MaxForce = wandererMaxForce;
+        wandererComponent.MaxSpeed = wandererMaxSpeed;
+        wandererComponent.StayInBoundsWeight = wandererStayInBoundsWeight;
+        wandererComponent.WanderWeight = wandererWanderWeight;
+        wandererComponent.WanderCircleRadius = wandererWanderCircleRadius;
+        wandererComponent.WanderOffset = wandererWanderOffset;
+        wandererComponent.WanderTime = wandererWanderTime;
+    }
     private Vector3 GetRandomPosition()
     {
         Vector3 pos = camera.ScreenToWorldPoint(new Vector3(Rnd.Range(0, camera.pixelWidth), Rnd.Range(0, camera.pixelHeight)));
@@ -132,5 +163,12 @@ public class GameManager : MonoBehaviour
             if (sceneChecker == SceneChecker.SeekerTest)
                 Gizmos.DrawWireCube(seekerComponent.WallBounds.center, seekerComponent.WallBounds.size);
         }
+    }
+
+    private Bounds UpdateAgentWallBounds()
+    {
+        float height = 2f * camera.orthographicSize;
+        float width = height * camera.aspect;
+        return new Bounds(Vector2.zero, new Vector2(width, height));
     }
 }

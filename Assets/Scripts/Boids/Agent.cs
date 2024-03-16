@@ -1,7 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using rnd = UnityEngine.Random;
 public abstract class Agent : MonoBehaviour
 {
     #region Force Weights
@@ -16,6 +17,9 @@ public abstract class Agent : MonoBehaviour
     //the angle/direction to wander to
     private float wanderAngle;
     private float wanderCurrentTime = 0;
+    private Vector2 wanderPosition;
+
+    private Vector2 FuturePosition { get { return Position + (velocity * futureTime); } }
     #endregion
 
     #region Setters
@@ -44,6 +48,7 @@ public abstract class Agent : MonoBehaviour
     #endregion
     #region Other Variables
     protected Vector2 velocity, acceleration;
+    [NonSerialized]
     public Vector2 Position;
     #endregion
     // Start is called before the first frame update
@@ -74,7 +79,7 @@ public abstract class Agent : MonoBehaviour
         //add acceleration to velocity
         velocity += acceleration * Time.deltaTime;
 
-        Vector2.ClampMagnitude(velocity, maxSpeed);
+        velocity = Vector2.ClampMagnitude(velocity, maxSpeed);
 
         //get the new direction
         RotateVehicle();
@@ -133,17 +138,18 @@ public abstract class Agent : MonoBehaviour
         //find random angle in intervals
         if (wanderCurrentTime <= 0)
         {
-            wanderAngle = Random.Range(-wanderOffset, wanderOffset);
+            wanderAngle += rnd.Range(-wanderOffset, wanderOffset);
             wanderCurrentTime = wanderTime;
         }
         //Prjoect a circle a distance ahead of you
-        Vector3 futurePosition = Position + (velocity * futureTime);
 
         //Find the spot on that circle using that angle of rotation
-        float xPos = Mathf.Cos(wanderAngle * Mathf.Deg2Rad) * wanderCircleRadius + futurePosition.x;
-        float yPos = Mathf.Sin(wanderAngle * Mathf.Deg2Rad) * wanderCircleRadius + futurePosition.y;
+        float xPos = Mathf.Cos(wanderAngle * Mathf.Deg2Rad) * wanderCircleRadius + FuturePosition.x;
+        float yPos = Mathf.Sin(wanderAngle * Mathf.Deg2Rad) * wanderCircleRadius + FuturePosition.y;
 
-        Vector3 wanderPosition = new Vector3(xPos, yPos, 0);
+        wanderPosition = new Vector3(xPos, yPos, 0);
+
+        Debug.Log("Wander Angle: " + wanderAngle);
 
         return Seek(wanderPosition);
     }
@@ -175,9 +181,21 @@ public abstract class Agent : MonoBehaviour
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.magenta;
-        
+
+        Vector2 futurePos = FuturePosition;
+
         //draw future position
-        Gizmos.DrawLine(Position, Position + velocity * futureTime);
-        Gizmos.DrawWireSphere(Position + velocity * futureTime, Radius);
+        Gizmos.DrawLine(Position, futurePos);
+        Gizmos.DrawWireSphere(futurePos, Radius);
+
+
+        Gizmos.color = Color.cyan;
+        if (wanderCircleRadius > 0)
+        {
+            //draw wander circle + positon the player is seeking
+            Gizmos.DrawLine(Position, FuturePosition);
+            Gizmos.DrawWireSphere(FuturePosition, wanderCircleRadius);
+            Gizmos.DrawLine(FuturePosition, wanderPosition);
+        }
     }
 }

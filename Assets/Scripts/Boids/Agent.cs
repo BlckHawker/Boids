@@ -5,11 +5,33 @@ using UnityEngine;
 public abstract class Agent : MonoBehaviour
 {
     #region Force Weights
-    protected float seekerWeight, fleerWeight, stayInBoundsWeight;
+    protected float seekWeight, fleerWeight, wanderWeight, stayInBoundsWeight;
+
+    #region Wander Weight
+    protected float wanderCircleRadius;
+    //the time in which to change angles/directions
+    protected float wanderTime;
+    //the range in which to change angles/directions
+    protected float wanderOffset;
+    //the angle/direction to wander to
+    private float wanderAngle;
+    private float wanderCurrentTime = 0;
+    #endregion
+
+    #region Setters
+    public float FleeWeight { set { fleerWeight = value; } }
+    public float FutureTime { set { futureTime = value; } }
+    public float SeekWeight { set { seekWeight = value; } }
+    public float StayInBoundsWeight { set { stayInBoundsWeight = value; } }
+    public float WanderCircleRadius { set { wanderCircleRadius = value; } }
+    public float WanderOffset { set { wanderOffset = value; } }
+    public float WanderTime { set { wanderTime = value; } }
+    public float WanderWeight { set { wanderWeight = value; } }
+    #endregion
+
     #endregion
     #region Bound Variables
     protected float futureTime, radius;
-    public float FutureTime { set { futureTime = value; } }
     public float Radius { get { return radius; } }
     protected Bounds agentBounds;
     public Bounds WallBounds { get; set; }
@@ -104,6 +126,26 @@ public abstract class Agent : MonoBehaviour
     protected Vector2 Flee(GameObject target)
     {
         return Flee(target.transform.position);
+    }
+    protected Vector2 Wander()
+    {
+        wanderCurrentTime -= Time.deltaTime;
+        //find random angle in intervals
+        if (wanderCurrentTime <= 0)
+        {
+            wanderAngle = Random.Range(-wanderOffset, wanderOffset);
+            wanderCurrentTime = wanderTime;
+        }
+        //Prjoect a circle a distance ahead of you
+        Vector3 futurePosition = Position + (velocity * futureTime);
+
+        //Find the spot on that circle using that angle of rotation
+        float xPos = Mathf.Cos(wanderAngle * Mathf.Deg2Rad) * wanderCircleRadius + futurePosition.x;
+        float yPos = Mathf.Sin(wanderAngle * Mathf.Deg2Rad) * wanderCircleRadius + futurePosition.y;
+
+        Vector3 wanderPosition = new Vector3(xPos, yPos, 0);
+
+        return Seek(wanderPosition);
     }
     protected Vector2 StayInBounds()
     {

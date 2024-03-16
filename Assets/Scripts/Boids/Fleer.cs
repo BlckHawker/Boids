@@ -6,9 +6,6 @@ public class Fleer : Agent
 {
     private GameObject target;
     public GameObject Target { set { target = value; } }
-    public float FleeWeight { set { fleerWeight = value; } }
-    public float StayInBoundsWeight { set { stayInBoundsWeight = value; } }
-
     protected override void CalcSteeringForces()
     {
         Vector2 totalForce = Vector2.zero;

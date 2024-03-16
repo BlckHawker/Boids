@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,8 +19,8 @@ public class UIManager : MonoBehaviour
     private SceneChecker sceneChecker;
     [SerializeField]
     private GameObject canvasGameObject;
-    private (Slider, TextMeshProUGUI) seekerFutureTimeTuple, seekerMassTuple, seekerMaxForceTuple, seekerMaxSpeedTuple, seekerWeightTuple, seekerStayInBoundTuple;
-    private (Slider, TextMeshProUGUI) fleerFutureTimeTuple, fleerMassTuple, fleerMaxForceTuple, fleerMaxSpeedTuple, fleerWeightTuple, fleerStayInBoundTuple;
+    private (Slider, Text) seekerFutureTimeTuple, seekerMassTuple, seekerMaxForceTuple, seekerMaxSpeedTuple, seekerWeightTuple, seekerStayInBoundTuple;
+    private (Slider, Text) fleerFutureTimeTuple, fleerMassTuple, fleerMaxForceTuple, fleerMaxSpeedTuple, fleerWeightTuple, fleerStayInBoundTuple;
 
 
     #region Seeker Values
@@ -75,13 +76,13 @@ public class UIManager : MonoBehaviour
         switch (sceneChecker)
         {
             case SceneChecker.SeekerTest:
-                Transform panelTransform = canvasGameObject.transform.Find("Panel");
-                seekerFutureTimeTuple = GetStatTuple(panelTransform, "Future Time", defaultSeekerFutureTime);
-                seekerMassTuple = GetStatTuple(panelTransform, "Mass", defaultSeekerMass);
-                seekerMaxForceTuple = GetStatTuple(panelTransform, "Max Force", defaultSeekerMaxForce);
-                seekerMaxSpeedTuple = GetStatTuple(panelTransform, "Max Speed", defaultSeekerMaxSpeed);
-                seekerWeightTuple = GetStatTuple(panelTransform, "Seeker Weight", defaultSeekerWeight);
-                seekerStayInBoundTuple = GetStatTuple(panelTransform, "Stay in Bounds Weight", defaultSeekerStayInBound);
+                Transform contentTransform = canvasGameObject.transform.Find("Panel").Find("Scroll Area").Find("Content");
+                seekerFutureTimeTuple = GetStatTuple(contentTransform, "Future Time", defaultSeekerFutureTime);
+                seekerMassTuple = GetStatTuple(contentTransform, "Mass", defaultSeekerMass);
+                seekerMaxForceTuple = GetStatTuple(contentTransform, "Max Force", defaultSeekerMaxForce);
+                seekerMaxSpeedTuple = GetStatTuple(contentTransform, "Max Speed", defaultSeekerMaxSpeed);
+                seekerWeightTuple = GetStatTuple(contentTransform, "Seeker Weight", defaultSeekerWeight);
+                seekerStayInBoundTuple = GetStatTuple(contentTransform, "Stay in Bounds Weight", defaultSeekerStayInBound);
                 break;
 
             case SceneChecker.FleerTest:
@@ -89,23 +90,26 @@ public class UIManager : MonoBehaviour
                 fleePanel = statPanel.Find("Flee Panel").gameObject;
                 seekPanel = statPanel.Find("Seek Panel").gameObject;
 
+                Transform fleePanelContent = fleePanel.transform.Find("Scroll Area").Find("Content");
+                Transform seekPanelContent = seekPanel.transform.Find("Scroll Area").Find("Content");
+
                 seekerButton = statPanel.Find("Seeker Button").GetComponent<Button>();
                 fleerButton = statPanel.Find("Flee Button").GetComponent<Button>();
                 panelsAndButtons = new List<(GameObject, Button)>() { (seekPanel.gameObject, seekerButton), (fleePanel.gameObject, fleerButton) };
 
-                seekerFutureTimeTuple = GetStatTuple(seekPanel.transform, "Future Time", defaultSeekerFutureTime);
-                seekerMassTuple = GetStatTuple(seekPanel.transform, "Mass", defaultSeekerMass);
-                seekerMaxForceTuple = GetStatTuple(seekPanel.transform, "Max Force", defaultSeekerMaxForce);
-                seekerMaxSpeedTuple = GetStatTuple(seekPanel.transform, "Max Speed", defaultSeekerMaxSpeed);
-                seekerWeightTuple = GetStatTuple(seekPanel.transform, "Seeker Weight", defaultSeekerWeight);
-                seekerStayInBoundTuple = GetStatTuple(seekPanel.transform, "Stay in Bounds Weight", defaultSeekerStayInBound);
+                seekerFutureTimeTuple = GetStatTuple(seekPanelContent, "Future Time", defaultSeekerFutureTime);
+                seekerMassTuple = GetStatTuple(seekPanelContent, "Mass", defaultSeekerMass);
+                seekerMaxForceTuple = GetStatTuple(seekPanelContent, "Max Force", defaultSeekerMaxForce);
+                seekerMaxSpeedTuple = GetStatTuple(seekPanelContent, "Max Speed", defaultSeekerMaxSpeed);
+                seekerWeightTuple = GetStatTuple(seekPanelContent, "Seeker Weight", defaultSeekerWeight);
+                seekerStayInBoundTuple = GetStatTuple(seekPanelContent, "Stay in Bounds Weight", defaultSeekerStayInBound);
 
-                fleerFutureTimeTuple = GetStatTuple(fleePanel.transform, "Future Time", defaultFleerWeight);
-                fleerMassTuple = GetStatTuple(fleePanel.transform, "Mass", defaultFleerMass);
-                fleerMaxForceTuple = GetStatTuple(fleePanel.transform, "Max Force", defaultFleerMaxForce);
-                fleerMaxSpeedTuple = GetStatTuple(fleePanel.transform, "Max Speed", defaultFleerMaxSpeed);
-                fleerWeightTuple = GetStatTuple(fleePanel.transform, "Flee Weight", defaultFleerWeight);
-                fleerStayInBoundTuple = GetStatTuple(fleePanel.transform, "Stay in Bounds Weight", defaultFleerStayInBound);
+                fleerFutureTimeTuple = GetStatTuple(fleePanelContent, "Future Time", defaultFleerWeight);
+                fleerMassTuple = GetStatTuple(fleePanelContent, "Mass", defaultFleerMass);
+                fleerMaxForceTuple = GetStatTuple(fleePanelContent, "Max Force", defaultFleerMaxForce);
+                fleerMaxSpeedTuple = GetStatTuple(fleePanelContent, "Max Speed", defaultFleerMaxSpeed);
+                fleerWeightTuple = GetStatTuple(fleePanelContent, "Flee Weight", defaultFleerWeight);
+                fleerStayInBoundTuple = GetStatTuple(fleePanelContent, "Stay in Bounds Weight", defaultFleerStayInBound);
                 ShowSeekPanel();
                 break;
         }
@@ -114,18 +118,19 @@ public class UIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (sceneChecker == SceneChecker.SeekerTest)
+        switch (sceneChecker)
         {
-            UpdateSeekerStats();
-        }
+            case SceneChecker.SeekerTest:
+                UpdateSeekerStats();
+                break;
 
-        else if (sceneChecker == SceneChecker.FleerTest)
-        {
-            UpdateSeekerStats();
-            UpdateFleerStats();
+            case SceneChecker.FleerTest:
+                UpdateSeekerStats();
+                UpdateFleerStats();
+                break;
         }
     }
-    private (Slider,TextMeshProUGUI) GetStatTuple(Transform transform, string parentName, float initialValue)
+    private (Slider, Text) GetStatTuple(Transform transform, string parentName, float initialValue)
     {
         Transform parent = transform.Find(parentName);
         Slider slider = parent.Find("Slider").GetComponent<Slider>();
@@ -133,10 +138,10 @@ public class UIManager : MonoBehaviour
         slider.maxValue = 10;
         slider.wholeNumbers = true;
         slider.value = initialValue;
-        TextMeshProUGUI text = parent.Find("Stat").GetComponent<TextMeshProUGUI>();
+        Text text = parent.Find("Stat").GetComponent<Text>();
         return (slider, text);
     }
-    private float UpdateStats((Slider, TextMeshProUGUI) tuple)
+    private float UpdateStats((Slider, Text) tuple)
     {
         tuple.Item2.text = tuple.Item1.value.ToString();
         return tuple.Item1.value;

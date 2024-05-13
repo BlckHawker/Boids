@@ -115,6 +115,10 @@ public abstract class Agent : MonoBehaviour
     {
         return Seek(target.transform.position);
     }
+    protected Vector2 Seek(Agent agent)
+    {
+        return Seek(agent.Position);
+    }
     protected Vector2 Flee(Vector2 targetPos)
     {
         //calculate desired veolcity
@@ -132,6 +136,10 @@ public abstract class Agent : MonoBehaviour
     {
         return Flee(target.transform.position);
     }
+    protected Vector2 Flee(Agent agent)
+    {
+        return Flee(agent.Position);
+    }
     protected Vector2 Wander()
     {
         wanderCurrentTime -= Time.deltaTime;
@@ -142,15 +150,13 @@ public abstract class Agent : MonoBehaviour
             wanderCurrentTime = wanderTime;
         }
         //Prjoect a circle a distance ahead of you
+        Vector2 FuturePos = FuturePosition;
 
         //Find the spot on that circle using that angle of rotation
-        float xPos = Mathf.Cos(wanderAngle * Mathf.Deg2Rad) * wanderCircleRadius + FuturePosition.x;
-        float yPos = Mathf.Sin(wanderAngle * Mathf.Deg2Rad) * wanderCircleRadius + FuturePosition.y;
+        float xPos = Mathf.Cos(wanderAngle * Mathf.Deg2Rad) * wanderCircleRadius + FuturePos.x;
+        float yPos = Mathf.Sin(wanderAngle * Mathf.Deg2Rad) * wanderCircleRadius + FuturePos.y;
 
         wanderPosition = new Vector3(xPos, yPos, 0);
-
-        Debug.Log("Wander Angle: " + wanderAngle);
-
         return Seek(wanderPosition);
     }
     protected Vector2 StayInBounds()
@@ -180,6 +186,8 @@ public abstract class Agent : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(Vector2.zero, WallBounds.size);
         Gizmos.color = Color.magenta;
 
         Vector2 futurePos = FuturePosition;

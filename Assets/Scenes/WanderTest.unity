@@ -4846,10 +4846,10 @@ MonoBehaviour:
   defaultWandererMaxForce: 0
   defaultWandererMaxSpeed: 0
   defaultWandererStayInBoundsWeight: 10
-  defaultWandererWanderWeight: 0
-  defaultWandererWanderCircleRadius: 3
-  defaultWandererWanderOffset: 10
-  defaultWandererWanderTime: 0
+  defaultWandererWanderWeight: 7
+  defaultWandererWanderCircleRadius: 2
+  defaultWandererWanderOffset: 100
+  defaultWandererWanderTime: 1
 --- !u!4 &1675351015
 Transform:
   m_ObjectHideFlags: 0

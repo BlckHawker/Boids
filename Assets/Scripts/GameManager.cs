@@ -53,7 +53,6 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        Bounds wallBounds = UpdateAgentWallBounds();
         if (sceneChecker == SceneChecker.SeekerTest)
         {
             dummy = Instantiate(dumbPrefab);
@@ -63,7 +62,6 @@ public class GameManager : MonoBehaviour
             seeker.transform.position = GetRandomPosition();
             seekerComponent = seeker.GetComponent<Seeker>();
             seekerComponent.Target = dummy;
-            seekerComponent.WallBounds = wallBounds;
 
             collisionChecker.SetSceneChecker((int)sceneChecker);
             collisionChecker.SetDummyObject(dummy);
@@ -78,27 +76,34 @@ public class GameManager : MonoBehaviour
             seekerComponent = seeker.GetComponent<Seeker>();
             seekerComponent.Position = GetRandomPosition();
             seekerComponent.Target = fleer.gameObject;
-            seekerComponent.WallBounds = wallBounds;
 
             fleerComponent = fleer.GetComponent<Fleer>();
             fleerComponent.Position = GetRandomPosition();
             fleerComponent.Target = seeker.gameObject;
-            fleerComponent.WallBounds = wallBounds;
         }
 
         else if (sceneChecker == SceneChecker.WandererTest)
         {
             wanderer = Instantiate(wandererPrefab);
             wandererComponent = wanderer.GetComponent<Wanderer>();
-            wandererComponent.WallBounds = wallBounds;
         }
+        UpdateAgentWallBounds();
     }
     void Update()
     {
-        if (sceneChecker == SceneChecker.SeekerTest && collisionChecker.CircleCollision())
-            dummy.transform.position = GetRandomPosition();
-
+        UpdateAgentWallBounds();
         UpdateValues();
+        switch (sceneChecker)
+        {
+            case SceneChecker.SeekerTest:
+                if(collisionChecker.CircleCollision())
+                    dummy.transform.position = GetRandomPosition();
+                break;
+            case SceneChecker.FleerTest:
+                break;
+            case SceneChecker.WandererTest:
+                break;
+        }
     }
 
     private void UpdateValues()
@@ -165,10 +170,24 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    private Bounds UpdateAgentWallBounds()
+    private void UpdateAgentWallBounds()
     {
         float height = 2f * camera.orthographicSize;
         float width = height * camera.aspect;
-        return new Bounds(Vector2.zero, new Vector2(width, height));
+        Bounds wallBounds = new Bounds(Vector2.zero, new Vector2(width, height));
+
+        switch (sceneChecker)
+        {
+            case SceneChecker.SeekerTest:
+                seekerComponent.WallBounds = wallBounds;
+                break;
+            case SceneChecker.FleerTest:
+                seekerComponent.WallBounds = wallBounds;
+                fleerComponent.WallBounds = wallBounds;
+                break;
+            case SceneChecker.WandererTest:
+                wandererComponent.WallBounds = wallBounds;
+                break;
+        }
     }
 }

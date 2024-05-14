@@ -1,24 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using rnd = UnityEngine.Random;
 public abstract class Agent : MonoBehaviour
 {
     #region Force Weights
     protected float seekWeight, fleerWeight, wanderWeight, stayInBoundsWeight;
-
-    #region Wander Weight
-    protected float wanderCircleRadius;
-    //the time in which to change angles/directions
-    protected float wanderTime;
-    //the range in which to change angles/directions
-    protected float wanderOffset;
-    //the angle/direction to wander to
-    private float wanderAngle;
-    private float wanderCurrentTime = 0;
-    private Vector2 wanderPosition;
-    #endregion
 
     #region Setters
     public float FleeWeight { set { fleerWeight = value; } }
@@ -46,9 +35,24 @@ public abstract class Agent : MonoBehaviour
     public float MaxSpeed { set { maxSpeed = value; } }
     #endregion
     #region Other Variables
+    #region Wander Variables
+    protected float wanderCircleRadius;
+    //the time in which to change angles/directions
+    protected float wanderTime;
+    //the range in which to change angles/directions
+    protected float wanderOffset;
+    //the angle/direction to wander to
+    private float wanderAngle;
+    private float wanderCurrentTime = 0;
+    private Vector2 wanderPosition;
+    #endregion
     protected Vector2 velocity, acceleration;
+    private List<Obstacle> obstacleList;
+    private List<Obstacle> importantObstacles = new List<Obstacle>(); // a list of obstacles that are "close enough"
+    private float avoidTime; // how far ahead in the future should we care about avoiding obstacles
     [NonSerialized]
     public Vector2 Position;
+    protected Vector2 direction;
     #endregion
     // Start is called before the first frame update
     void Start()
@@ -91,6 +95,7 @@ public abstract class Agent : MonoBehaviour
 
     private void RotateVehicle()
     {
+        direction = velocity.normalized;
         transform.rotation = Quaternion.LookRotation(Vector3.back, velocity);
     }
 
@@ -177,6 +182,61 @@ public abstract class Agent : MonoBehaviour
         
         return Vector2.zero;
     }
+    protected Vector2 AvoidObstacles()
+    {
+        Vector2 steeringForce = Vector2.zero;
+        importantObstacles = new List<Obstacle>();
+        foreach (Obstacle obstacle in obstacleList)
+        { 
+            Vector2 obstacleToAgent = Position - (Vector2)obstacle.transform.position;
+            float forwardDot = Vector2.Dot(direction, obstacleToAgent);
+            float rightDot = Vector2.Dot(transform.right, obstacleToAgent);
+
+            //if the dot prduct is negative, then the object is behind, and ignore it
+            if (forwardDot < 0)
+            {
+                continue;
+            }
+
+            //if the object is too far in the future, ignore it
+            if (forwardDot > (Position + velocity * avoidTime).magnitude)
+            {
+                continue;
+            }
+
+            //if the object is too far right, ignore it
+            if (rightDot > radius + obstacle.Radius)
+            {
+                continue;
+            }
+
+            //if the object is too far left, ignore it
+            if (rightDot < -(radius + obstacle.Radius))
+            {
+                continue;
+            }
+
+            //for debugging purposes, add this obstacle to the list of important obstcles
+            importantObstacles.Add(obstacle);
+
+            //if the dot product is negative, the object is to the left and the vehicle has to move to the right (scale the weight based on distance)
+            Vector2 desiredVelocity = Vector2.zero;
+            if (rightDot > 0)
+            {
+                desiredVelocity = transform.right * maxSpeed * (1f / obstacleToAgent.magnitude);
+            }
+
+            //if the dot product is positive, the object is to the right and the vehicle has to move to the left
+            else if (rightDot > 0)
+            {
+                desiredVelocity = -transform.right * maxSpeed * (1f / obstacleToAgent.magnitude);
+            }
+
+            steeringForce += desiredVelocity - velocity;
+        }
+
+        return steeringForce;
+    }
     protected void ApplyForce(Vector2 force)
     {
         acceleration += force / mass;
@@ -185,18 +245,20 @@ public abstract class Agent : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        //draw stay in bounds
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(Vector2.zero, WallBounds.size);
         
+        //draw stay in bounds future position
         Gizmos.color = Color.magenta;
 
         Vector2 stayInBoundsFuturePos = Position + velocity * stayInBoundsFutureTime;
 
-        //draw future position
         Gizmos.DrawLine(Position, stayInBoundsFuturePos);
         Gizmos.DrawWireSphere(stayInBoundsFuturePos, Radius);
 
 
+        //draw wander future position / target
         Gizmos.color = Color.cyan;
         if (wanderCircleRadius > 0)
         {
@@ -205,6 +267,13 @@ public abstract class Agent : MonoBehaviour
             Gizmos.DrawLine(Position, futurePosition);
             Gizmos.DrawWireSphere(futurePosition, wanderCircleRadius);
             Gizmos.DrawLine(futurePosition, wanderPosition);
+        }
+
+        //draw lines to important obstacles
+        Gizmos.color = Color.red;
+        foreach (Obstacle obstacle in importantObstacles)
+        {
+            Gizmos.DrawLine(obstacle.transform.position, obstacle.transform.position);
         }
     }
 }

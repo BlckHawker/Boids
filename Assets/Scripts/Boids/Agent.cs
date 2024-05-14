@@ -18,16 +18,16 @@ public abstract class Agent : MonoBehaviour
     private float wanderAngle;
     private float wanderCurrentTime = 0;
     private Vector2 wanderPosition;
-
-    private Vector2 FuturePosition { get { return Position + (velocity * futureTime); } }
     #endregion
 
     #region Setters
     public float FleeWeight { set { fleerWeight = value; } }
-    public float FutureTime { set { futureTime = value; } }
+    public float Radius { get { return radius; } }
     public float SeekWeight { set { seekWeight = value; } }
+    public float StayInBoundsFutureTime { set { stayInBoundsFutureTime = value; } }
     public float StayInBoundsWeight { set { stayInBoundsWeight = value; } }
     public float WanderCircleRadius { set { wanderCircleRadius = value; } }
+    public float WanderFutureTime { set { wanderFutureTime = value; } }
     public float WanderOffset { set { wanderOffset = value; } }
     public float WanderTime { set { wanderTime = value; } }
     public float WanderWeight { set { wanderWeight = value; } }
@@ -35,8 +35,7 @@ public abstract class Agent : MonoBehaviour
 
     #endregion
     #region Bound Variables
-    protected float futureTime, radius;
-    public float Radius { get { return radius; } }
+    protected float radius, stayInBoundsFutureTime, wanderFutureTime;
     protected Bounds agentBounds;
     public Bounds WallBounds { get; set; }
     #endregion
@@ -150,11 +149,11 @@ public abstract class Agent : MonoBehaviour
             wanderCurrentTime = wanderTime;
         }
         //Prjoect a circle a distance ahead of you
-        Vector2 FuturePos = FuturePosition;
+        Vector2 futurePosition = Position + velocity * wanderFutureTime;
 
         //Find the spot on that circle using that angle of rotation
-        float xPos = Mathf.Cos(wanderAngle * Mathf.Deg2Rad) * wanderCircleRadius + FuturePos.x;
-        float yPos = Mathf.Sin(wanderAngle * Mathf.Deg2Rad) * wanderCircleRadius + FuturePos.y;
+        float xPos = Mathf.Cos(wanderAngle * Mathf.Deg2Rad) * wanderCircleRadius + futurePosition.x;
+        float yPos = Mathf.Sin(wanderAngle * Mathf.Deg2Rad) * wanderCircleRadius + futurePosition.y;
 
         wanderPosition = new Vector3(xPos, yPos, 0);
         return Seek(wanderPosition);
@@ -166,7 +165,7 @@ public abstract class Agent : MonoBehaviour
         float wallMinY = WallBounds.min.y;
         float wallMaxY = WallBounds.max.y;
 
-        Vector2 futurePosition = Position + velocity * futureTime;
+        Vector2 futurePosition = Position + velocity * stayInBoundsFutureTime;
 
         bool left = futurePosition.x < wallMinX;
         bool right = futurePosition.x > wallMaxX;
@@ -188,22 +187,24 @@ public abstract class Agent : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(Vector2.zero, WallBounds.size);
+        
         Gizmos.color = Color.magenta;
 
-        Vector2 futurePos = FuturePosition;
+        Vector2 stayInBoundsFuturePos = Position + velocity * stayInBoundsFutureTime;
 
         //draw future position
-        Gizmos.DrawLine(Position, futurePos);
-        Gizmos.DrawWireSphere(futurePos, Radius);
+        Gizmos.DrawLine(Position, stayInBoundsFuturePos);
+        Gizmos.DrawWireSphere(stayInBoundsFuturePos, Radius);
 
 
         Gizmos.color = Color.cyan;
         if (wanderCircleRadius > 0)
         {
             //draw wander circle + positon the player is seeking
-            Gizmos.DrawLine(Position, FuturePosition);
-            Gizmos.DrawWireSphere(FuturePosition, wanderCircleRadius);
-            Gizmos.DrawLine(FuturePosition, wanderPosition);
+            Vector2 futurePosition = Position + velocity * wanderFutureTime;
+            Gizmos.DrawLine(Position, futurePosition);
+            Gizmos.DrawWireSphere(futurePosition, wanderCircleRadius);
+            Gizmos.DrawLine(futurePosition, wanderPosition);
         }
     }
 }

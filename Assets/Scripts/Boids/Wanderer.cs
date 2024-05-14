@@ -13,5 +13,7 @@ public class Wanderer : Agent
         totalForce += Wander() * wanderWeight;
         totalForce = Vector2.ClampMagnitude(totalForce, MaxForce);
         ApplyForce(totalForce);
+
+        Debug.Log($"Mass: {mass}\nMax Force: {MaxForce}\nMax Speed: {maxSpeed}\nStay In Bounds Future Time: {stayInBoundsFutureTime}\nStay In Bounds Weight: {stayInBoundsWeight}\nWander Weight: {wanderWeight}\nWander circle Radius: {wanderCircleRadius}\nWander Offset: {wanderOffset}\nWander Time: {wanderTime}\nWander Future Time: {wanderFutureTime}");
     }
 }

@@ -14,8 +14,7 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private SceneChecker sceneChecker;
 
-    [SerializeField]
-    CollisionChecker collisionChecker;
+    private CollisionChecker collisionChecker;
 
     #region Prefabs
     [SerializeField]
@@ -39,11 +38,11 @@ public class GameManager : MonoBehaviour
 
     #region Agent Stats
     [NonSerialized]
-    public float seekerFutureTime, seekerMass, seekerMaxForce, seekerMaxSpeed, seekerWeight, seekerStayInBoundsWeight;
+    public float seekerStayInBoundsFutureTime, seekerMass, seekerMaxForce, seekerMaxSpeed, seekerWeight, seekerStayInBoundsWeight;
     [NonSerialized]
-    public float fleerFutureTime, fleerMass, fleerMaxForce, fleerMaxSpeed, fleerWeight, fleerStayInBoundsWeight;
+    public float fleerStayInBoundsFutureTime, fleerMass, fleerMaxForce, fleerMaxSpeed, fleerWeight, fleerStayInBoundsWeight;
     [NonSerialized]
-    public float wandererFutureTime, wandererMass, wandererMaxForce, wandererMaxSpeed, wandererStayInBoundsWeight, wandererWanderWeight, wandererWanderCircleRadius, wandererWanderOffset, wandererWanderTime;
+    public float wandererStayInBoundsFutureTime, wandererWanderFutureTime, wandererMass, wandererMaxForce, wandererMaxSpeed, wandererStayInBoundsWeight, wandererWanderWeight, wandererWanderCircleRadius, wandererWanderOffset, wandererWanderTime;
     #endregion
 
     #region Screen Position
@@ -53,6 +52,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        collisionChecker = GetComponent<CollisionChecker>();
         if (sceneChecker == SceneChecker.SeekerTest)
         {
             dummy = Instantiate(dumbPrefab);
@@ -126,7 +126,7 @@ public class GameManager : MonoBehaviour
     }
     private void UpdateSeekerValues()
     {
-        seekerComponent.FutureTime = seekerFutureTime;
+        seekerComponent.StayInBoundsFutureTime = seekerStayInBoundsFutureTime;
         seekerComponent.Mass = seekerMass;
         seekerComponent.MaxForce = seekerMaxForce;
         seekerComponent.MaxSpeed = seekerMaxSpeed;
@@ -135,7 +135,7 @@ public class GameManager : MonoBehaviour
     }
     private void UpdateFleerValues()
     {
-        fleerComponent.FutureTime = fleerFutureTime;
+        fleerComponent.StayInBoundsFutureTime = fleerStayInBoundsFutureTime;
         fleerComponent.Mass = fleerMass;
         fleerComponent.MaxForce = fleerMaxForce;
         fleerComponent.MaxSpeed = fleerMaxSpeed;
@@ -144,7 +144,8 @@ public class GameManager : MonoBehaviour
     }
     private void UpdateWandererValues()
     {
-        wandererComponent.FutureTime = wandererFutureTime;
+        wandererComponent.StayInBoundsFutureTime = wandererStayInBoundsFutureTime;
+        wandererComponent.WanderFutureTime = wandererWanderFutureTime;
         wandererComponent.Mass = wandererMass;
         wandererComponent.MaxForce = wandererMaxForce;
         wandererComponent.MaxSpeed = wandererMaxSpeed;
@@ -159,15 +160,6 @@ public class GameManager : MonoBehaviour
         Vector3 pos = camera.ScreenToWorldPoint(new Vector3(Rnd.Range(0, camera.pixelWidth), Rnd.Range(0, camera.pixelHeight)));
         pos.z = 0;
         return pos;
-    }
-    private void OnDrawGizmos()
-    {
-        if (Application.isPlaying)
-        {
-            Gizmos.color = Color.green;
-            if (sceneChecker == SceneChecker.SeekerTest)
-                Gizmos.DrawWireCube(seekerComponent.WallBounds.center, seekerComponent.WallBounds.size);
-        }
     }
 
     private void UpdateAgentWallBounds()

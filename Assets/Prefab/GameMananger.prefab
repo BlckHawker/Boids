@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5997322525865454206}
   - component: {fileID: 615148651115639377}
   - component: {fileID: 7230900674605804661}
+  - component: {fileID: 2581380956751461018}
   m_Layer: 0
   m_Name: GameMananger
   m_TagString: Untagged
@@ -60,9 +61,11 @@ MonoBehaviour:
   defaultFleerMaxSpeed: 10
   defaultFleerWeight: 4
   defaultFleerStayInBound: 4
+  defaultWandererAvoidTime: 0
   defaultWandererMass: 0
   defaultWandererMaxForce: 0
   defaultWandererMaxSpeed: 3
+  defaultWandererObstacleAvoidanceWeight: 0
   defaultWandererStayInBoundsFutureTime: 5
   defaultWandererStayInBoundsWeight: 10
   defaultWandererWanderWeight: 2
@@ -83,7 +86,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sceneChecker: 1
-  collisionChecker: {fileID: 0}
   dumbPrefab: {fileID: 4286302130894826189, guid: dc846b175f3d7384890537b430418aa3, type: 3}
   seekerPrefab: {fileID: 8160406667041693798, guid: e874ffa99319ae04f9c17703c17a9d65, type: 3}
   fleerPrefab: {fileID: 3305228377004344979, guid: 69f1f517e2f522249b4ddc242c1608fd, type: 3}
@@ -101,3 +103,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9601a57c657d4904b9a7e849ecab91c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2581380956751461018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8623255771874785623}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc15499aadbca3743aa176270158da85, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  obstaclePrefab: {fileID: 6354171434752513530, guid: 2a5f0f4324238ac459098f05b232abd8, type: 3}

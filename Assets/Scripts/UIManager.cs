@@ -21,7 +21,7 @@ public class UIManager : MonoBehaviour
     private GameObject canvasGameObject;
     private (Slider, Text) seekerStayInBoundsFutureTimeTuple, seekerMassTuple, seekerMaxForceTuple, seekerMaxSpeedTuple, seekerWeightTuple, seekerStayInBoundTuple;
     private (Slider, Text) fleerStayInBoundsFutureTimeTuple, fleerMassTuple, fleerMaxForceTuple, fleerMaxSpeedTuple, fleerWeightTuple, fleerStayInBoundTuple;
-    private (Slider, Text) wandererStayInBoundsFutureTimeTuple, wandererWanderFutureTimeTuple, wandererMassTuple, wandererMaxForceTuple, wandererMaxSpeedTuple, wandererObstacleAvoidanceWeightTuple, wandererStayInBoundsWeightTuple, wandererWanderWeightTuple, wandererWanderCircleRadiusTuple, wandererWanderOffsetTuple, wandererWanderTimeTuple;
+    private (Slider, Text) wandererAvoidTimeTuple, wandererStayInBoundsFutureTimeTuple, wandererWanderFutureTimeTuple, wandererMassTuple, wandererMaxForceTuple, wandererMaxSpeedTuple, wandererObstacleAvoidanceWeightTuple, wandererStayInBoundsWeightTuple, wandererWanderWeightTuple, wandererWanderCircleRadiusTuple, wandererWanderOffsetTuple, wandererWanderTimeTuple;
 
     #region Seeker Values
     [Header("Seeker Values")]
@@ -43,6 +43,8 @@ public class UIManager : MonoBehaviour
 
     #region Wanderer Values
     [Header("Wanderer Values")]
+    [SerializeField, Range(0f, 3f)]
+    private float defaultWandererAvoidTime;
     [SerializeField, Range(1, 10)]
     private int defaultWandererMass;
     [SerializeField, Range(1, 10)]
@@ -132,6 +134,7 @@ public class UIManager : MonoBehaviour
 
                 if(sceneChecker == SceneChecker.ObstacleAvoidanceTest)
                 {
+                    wandererAvoidTimeTuple = GetStatTuple(transform: contentTransform, parentName: "Avoid Time", initialValue: defaultWandererAvoidTime);
                     wandererObstacleAvoidanceWeightTuple = GetStatTuple(transform: contentTransform, parentName: "Obstacle Avoidance Weight", initialValue: defaultWandererObstacleAvoidanceWeight);
                 }
                 break;

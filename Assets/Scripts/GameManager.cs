@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using Rnd = UnityEngine.Random;
+using System.Collections.Generic;
 
 public class GameManager : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class GameManager : MonoBehaviour
     private SceneChecker sceneChecker;
 
     private CollisionChecker collisionChecker;
+    private ObstacleManager obstacleManager;
 
     #region Prefabs
     [SerializeField]
@@ -43,7 +45,7 @@ public class GameManager : MonoBehaviour
     [NonSerialized]
     public float fleerStayInBoundsFutureTime, fleerMass, fleerMaxForce, fleerMaxSpeed, fleerWeight, fleerStayInBoundsWeight;
     [NonSerialized]
-    public float wandererObstacleAvoidanceWeight, wandererStayInBoundsFutureTime, wandererWanderFutureTime, wandererMass, wandererMaxForce, wandererMaxSpeed, wandererStayInBoundsWeight, wandererWanderWeight, wandererWanderCircleRadius, wandererWanderOffset, wandererWanderTime;
+    public float wandererAvoidTime, wandererObstacleAvoidanceWeight, wandererStayInBoundsFutureTime, wandererWanderFutureTime, wandererMass, wandererMaxForce, wandererMaxSpeed, wandererStayInBoundsWeight, wandererWanderWeight, wandererWanderCircleRadius, wandererWanderOffset, wandererWanderTime;
     #endregion
 
     #region Screen Position
@@ -53,7 +55,10 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+
         collisionChecker = GetComponent<CollisionChecker>();
+        obstacleManager = GetComponent<ObstacleManager>();
+        obstacleManager.obstacleList = new List<Obstacle>();
         switch (sceneChecker)
         {
             case SceneChecker.SeekerTest:
@@ -110,55 +115,54 @@ public class GameManager : MonoBehaviour
 
     private void UpdateValues()
     {
-        if (sceneChecker == SceneChecker.SeekerTest)
+        switch (sceneChecker)
         {
-            UpdateSeekerValues();
-        }
-
-        else if (sceneChecker == SceneChecker.FleerTest)
-        {
-            UpdateSeekerValues();
-            UpdateFleerValues();
-        }
-
-        else if(sceneChecker == SceneChecker.WandererTest) 
-        {
-            UpdateWandererValues();
+            case SceneChecker.SeekerTest:
+                UpdateSeekerValues();
+                break;
+            case SceneChecker.FleerTest: 
+                UpdateFleerValues(); 
+                break;
+            case SceneChecker.WandererTest: 
+            case SceneChecker.ObstacleAvoidanceTest: 
+                UpdateWandererValues(); 
+                break;
         }
     }
     private void UpdateSeekerValues()
     {
-        seekerComponent.StayInBoundsFutureTime = seekerStayInBoundsFutureTime;
         seekerComponent.Mass = seekerMass;
         seekerComponent.MaxForce = seekerMaxForce;
         seekerComponent.MaxSpeed = seekerMaxSpeed;
         seekerComponent.SeekWeight = seekerWeight;
+        seekerComponent.StayInBoundsFutureTime = seekerStayInBoundsFutureTime;
         seekerComponent.StayInBoundsWeight = seekerStayInBoundsWeight;
     }
     private void UpdateFleerValues()
     {
-        fleerComponent.StayInBoundsFutureTime = fleerStayInBoundsFutureTime;
         fleerComponent.Mass = fleerMass;
         fleerComponent.MaxForce = fleerMaxForce;
         fleerComponent.MaxSpeed = fleerMaxSpeed;
         fleerComponent.FleeWeight = fleerWeight;
+        fleerComponent.StayInBoundsFutureTime = fleerStayInBoundsFutureTime;
         fleerComponent.StayInBoundsWeight = fleerStayInBoundsWeight;
     }
     private void UpdateWandererValues()
     {
-        wandererComponent.StayInBoundsFutureTime = wandererStayInBoundsFutureTime;
-        wandererComponent.WanderFutureTime = wandererWanderFutureTime;
         wandererComponent.Mass = wandererMass;
         wandererComponent.MaxForce = wandererMaxForce;
         wandererComponent.MaxSpeed = wandererMaxSpeed;
+        wandererComponent.StayInBoundsFutureTime = wandererStayInBoundsFutureTime;
         wandererComponent.StayInBoundsWeight = wandererStayInBoundsWeight;
-        wandererComponent.WanderWeight = wandererWanderWeight;
         wandererComponent.WanderCircleRadius = wandererWanderCircleRadius;
+        wandererComponent.WanderFutureTime = wandererWanderFutureTime;
+        wandererComponent.WanderWeight = wandererWanderWeight;
         wandererComponent.WanderOffset = wandererWanderOffset;
         wandererComponent.WanderTime = wandererWanderTime;
 
         if(sceneChecker == SceneChecker.ObstacleAvoidanceTest) 
         {
+            wandererComponent.AvoidTime = wandererAvoidTime;
             wandererComponent.AvoidObstacleWeight = wandererObstacleAvoidanceWeight;
         }
     }

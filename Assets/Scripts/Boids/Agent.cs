@@ -31,6 +31,7 @@ public abstract class Agent : MonoBehaviour
     #endregion
     #region Stat Variables
     protected float mass, maxSpeed;
+    public float AvoidTime { set { avoidTime = value; } }
     public float Mass { set { mass = value; } }
     public float MaxForce { get; set; }
     public float MaxSpeed { set { maxSpeed = value; } }
@@ -54,7 +55,12 @@ public abstract class Agent : MonoBehaviour
     private float avoidTime; // how far ahead in the future should we care about avoiding obstacles
     [NonSerialized]
     public Vector2 Position;
-    protected Vector2 direction;
+    protected Vector2 direction { get { return velocity.normalized; } }
+    #region Future Times
+    private Vector2 wanderFuturePosition { get { return Position + velocity * wanderFutureTime; } }
+    private Vector2 stayInBoundsFuturePosition { get { return Position + velocity * stayInBoundsFutureTime; } }
+    private Vector2 avoidObstacleFuturePosition { get { return Position + velocity * avoidTime; } }
+    #endregion
     #endregion
     // Start is called before the first frame update
     void Start()
@@ -76,7 +82,6 @@ public abstract class Agent : MonoBehaviour
             return;
         }
 
-
         //reset acceleration
         acceleration = Vector2.zero;
         CalcSteeringForces();
@@ -97,7 +102,6 @@ public abstract class Agent : MonoBehaviour
 
     private void RotateVehicle()
     {
-        direction = velocity.normalized;
         transform.rotation = Quaternion.LookRotation(Vector3.back, velocity);
     }
 
@@ -156,7 +160,7 @@ public abstract class Agent : MonoBehaviour
             wanderCurrentTime = wanderTime;
         }
         //Prjoect a circle a distance ahead of you
-        Vector2 futurePosition = Position + velocity * wanderFutureTime;
+        Vector2 futurePosition = wanderFuturePosition;
 
         //Find the spot on that circle using that angle of rotation
         float xPos = Mathf.Cos(wanderAngle * Mathf.Deg2Rad) * wanderCircleRadius + futurePosition.x;
@@ -172,7 +176,7 @@ public abstract class Agent : MonoBehaviour
         float wallMinY = WallBounds.min.y;
         float wallMaxY = WallBounds.max.y;
 
-        Vector2 futurePosition = Position + velocity * stayInBoundsFutureTime;
+        Vector2 futurePosition = stayInBoundsFuturePosition;
 
         bool left = futurePosition.x < wallMinX;
         bool right = futurePosition.x > wallMaxX;
@@ -201,7 +205,7 @@ public abstract class Agent : MonoBehaviour
             }
 
             //if the object is too far in the future, ignore it
-            if (forwardDot > (Position + velocity * avoidTime).magnitude)
+            if (forwardDot > avoidObstacleFuturePosition.magnitude + radius)
             {
                 continue;
             }
@@ -221,8 +225,9 @@ public abstract class Agent : MonoBehaviour
             //for debugging purposes, add this obstacle to the list of important obstcles
             importantObstacles.Add(obstacle);
 
-            //if the dot product is negative, the object is to the left and the vehicle has to move to the right (scale the weight based on distance)
             Vector2 desiredVelocity = Vector2.zero;
+
+            //if the dot product is negative, the object is to the left and the vehicle has to move to the right (scale the weight based on distance)
             if (rightDot > 0)
             {
                 desiredVelocity = transform.right * maxSpeed * (1f / obstacleToAgent.magnitude);
@@ -234,7 +239,7 @@ public abstract class Agent : MonoBehaviour
                 desiredVelocity = -transform.right * maxSpeed * (1f / obstacleToAgent.magnitude);
             }
 
-            steeringForce += desiredVelocity - velocity;
+            steeringForce += desiredVelocity.magnitude != 0 ? desiredVelocity - velocity : Vector2.zero;
         }
 
         return steeringForce;
@@ -254,22 +259,15 @@ public abstract class Agent : MonoBehaviour
         //draw stay in bounds future position
         Gizmos.color = Color.magenta;
 
-        Vector2 stayInBoundsFuturePos = Position + velocity * stayInBoundsFutureTime;
-
-        Gizmos.DrawLine(Position, stayInBoundsFuturePos);
-        Gizmos.DrawWireSphere(stayInBoundsFuturePos, Radius);
+        Gizmos.DrawLine(Position, stayInBoundsFuturePosition);
+        Gizmos.DrawWireSphere(stayInBoundsFuturePosition, Radius);
 
 
-        //draw wander future position / target
+        //draw wander future position / target + wander circle + positon the player is seeking
         Gizmos.color = Color.cyan;
-        if (wanderCircleRadius > 0)
-        {
-            //draw wander circle + positon the player is seeking
-            Vector2 futurePosition = Position + velocity * wanderFutureTime;
-            Gizmos.DrawLine(Position, futurePosition);
-            Gizmos.DrawWireSphere(futurePosition, wanderCircleRadius);
-            Gizmos.DrawLine(futurePosition, wanderPosition);
-        }
+        Gizmos.DrawLine(Position, wanderFuturePosition);
+        Gizmos.DrawWireSphere(wanderFuturePosition, wanderCircleRadius);
+        Gizmos.DrawLine(wanderFuturePosition, wanderPosition);
 
         //draw lines to important obstacles
         Gizmos.color = Color.red;
@@ -277,5 +275,10 @@ public abstract class Agent : MonoBehaviour
         {
             Gizmos.DrawLine(obstacle.transform.position, obstacle.transform.position);
         }
+
+        //draw box area to avoid obstacles
+        Vector3 avoidBoxSize = new Vector3(radius * 2f, avoidObstacleFuturePosition.magnitude + radius, radius * 2f);
+        Vector3 boxCenter = new Vector3(0, (avoidObstacleFuturePosition.magnitude + radius) / 2f, 0);
+        Gizmos.DrawWireCube(boxCenter, avoidBoxSize);
     }
 }

@@ -7,9 +7,10 @@ using rnd = UnityEngine.Random;
 public abstract class Agent : MonoBehaviour
 {
     #region Force Weights
-    protected float seekWeight, fleerWeight, wanderWeight, stayInBoundsWeight;
+    protected float seekWeight, fleerWeight, wanderWeight, stayInBoundsWeight, avoidObstacleWeight;
 
     #region Setters
+    public float AvoidObstacleWeight { set { avoidObstacleWeight = value;  } }
     public float FleeWeight { set { fleerWeight = value; } }
     public float Radius { get { return radius; } }
     public float SeekWeight { set { seekWeight = value; } }
@@ -48,6 +49,7 @@ public abstract class Agent : MonoBehaviour
     #endregion
     protected Vector2 velocity, acceleration;
     private List<Obstacle> obstacleList;
+    public List<Obstacle> ObstacleList { set { obstacleList = value; } }
     private List<Obstacle> importantObstacles = new List<Obstacle>(); // a list of obstacles that are "close enough"
     private float avoidTime; // how far ahead in the future should we care about avoiding obstacles
     [NonSerialized]
@@ -99,7 +101,7 @@ public abstract class Agent : MonoBehaviour
         transform.rotation = Quaternion.LookRotation(Vector3.back, velocity);
     }
 
-    #region Agent Weight Methods
+    #region Agent Force Methods
     protected abstract void CalcSteeringForces();
 
     protected Vector2 Seek(Vector2 targetPos)

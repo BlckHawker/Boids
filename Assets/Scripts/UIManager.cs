@@ -7,12 +7,11 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
-    // todo Fix f not being updated when inspector values are changed
-
     private enum SceneChecker
     {
         SeekerTest,
         FleerTest,
+        ObstacleAvoidanceTest,
         WandererTest,
     }
 
@@ -22,7 +21,7 @@ public class UIManager : MonoBehaviour
     private GameObject canvasGameObject;
     private (Slider, Text) seekerStayInBoundsFutureTimeTuple, seekerMassTuple, seekerMaxForceTuple, seekerMaxSpeedTuple, seekerWeightTuple, seekerStayInBoundTuple;
     private (Slider, Text) fleerStayInBoundsFutureTimeTuple, fleerMassTuple, fleerMaxForceTuple, fleerMaxSpeedTuple, fleerWeightTuple, fleerStayInBoundTuple;
-    private (Slider, Text) wandererStayInBoundsFutureTimeTuple, wandererWanderFutureTimeTuple, wandererMassTuple, wandererMaxForceTuple, wandererMaxSpeedTuple, wandererStayInBoundsWeightTuple, wandererWanderWeightTuple, wandererWanderCircleRadiusTuple, wandererWanderOffsetTuple, wandererWanderTimeTuple;
+    private (Slider, Text) wandererStayInBoundsFutureTimeTuple, wandererWanderFutureTimeTuple, wandererMassTuple, wandererMaxForceTuple, wandererMaxSpeedTuple, wandererObstacleAvoidanceWeightTuple, wandererStayInBoundsWeightTuple, wandererWanderWeightTuple, wandererWanderCircleRadiusTuple, wandererWanderOffsetTuple, wandererWanderTimeTuple;
 
     #region Seeker Values
     [Header("Seeker Values")]
@@ -50,6 +49,8 @@ public class UIManager : MonoBehaviour
     private int defaultWandererMaxForce;
     [SerializeField, Range(1, 10)]
     private int defaultWandererMaxSpeed;
+    [SerializeField, Range(1, 10)]
+    private int defaultWandererObstacleAvoidanceWeight;
     [SerializeField, Range(1, 10)]
     private int defaultWandererStayInBoundsFutureTime;
     [SerializeField, Range(1, 10)]
@@ -79,12 +80,12 @@ public class UIManager : MonoBehaviour
         {
             case SceneChecker.SeekerTest:
                 contentTransform = canvasGameObject.transform.Find("Panel/Scroll Area/Content");
-                seekerStayInBoundsFutureTimeTuple = GetStatTuple(contentTransform, parentName: "Future Time", initialValue: defaultSeekerFutureTime, minValue: 1, maxValue: 10, intOnly: true);
-                seekerMassTuple = GetStatTuple(contentTransform, parentName: "Mass", initialValue: defaultSeekerMass, minValue: 1, maxValue: 10, intOnly: true);
-                seekerMaxForceTuple = GetStatTuple(contentTransform, parentName: "Max Force", initialValue: defaultSeekerMaxForce, minValue: 1, maxValue: 10, intOnly: true);
-                seekerMaxSpeedTuple = GetStatTuple(contentTransform, parentName: "Max Speed", initialValue: defaultSeekerMaxSpeed, minValue: 1, maxValue: 10, intOnly: true);
-                seekerWeightTuple = GetStatTuple(contentTransform, parentName: "Seeker Weight", initialValue: defaultSeekerWeight, minValue: 1, maxValue: 10, intOnly: true);
-                seekerStayInBoundTuple = GetStatTuple(contentTransform, parentName: "Stay in Bounds Weight", initialValue: defaultSeekerStayInBound, minValue: 1, maxValue: 10, intOnly: true);
+                seekerStayInBoundsFutureTimeTuple = GetStatTuple(contentTransform, parentName: "Future Time", initialValue: defaultSeekerFutureTime);
+                seekerMassTuple = GetStatTuple(contentTransform, parentName: "Mass", initialValue: defaultSeekerMass);
+                seekerMaxForceTuple = GetStatTuple(contentTransform, parentName: "Max Force", initialValue: defaultSeekerMaxForce);
+                seekerMaxSpeedTuple = GetStatTuple(contentTransform, parentName: "Max Speed", initialValue: defaultSeekerMaxSpeed);
+                seekerWeightTuple = GetStatTuple(contentTransform, parentName: "Seeker Weight", initialValue: defaultSeekerWeight);
+                seekerStayInBoundTuple = GetStatTuple(contentTransform, parentName: "Stay in Bounds Weight", initialValue: defaultSeekerStayInBound);
                 break;
 
             case SceneChecker.FleerTest:
@@ -92,41 +93,47 @@ public class UIManager : MonoBehaviour
                 fleePanel = statPanel.Find("Flee Panel").gameObject;
                 seekPanel = statPanel.Find("Seek Panel").gameObject;
 
-                Transform fleePanelContent = fleePanel.transform.Find("Scroll Area").Find("Content");
-                Transform seekPanelContent = seekPanel.transform.Find("Scroll Area").Find("Content");
+                Transform fleePanelContent = fleePanel.transform.Find("Scroll Area/Content");
+                Transform seekPanelContent = seekPanel.transform.Find("Scroll Area/Content");
 
                 seekerButton = statPanel.Find("Seeker Button").GetComponent<Button>();
                 fleerButton = statPanel.Find("Flee Button").GetComponent<Button>();
-                panelsAndButtons = new List<(GameObject, Button)>() { (seekPanel.gameObject, seekerButton), (fleePanel.gameObject, fleerButton) };
+                panelsAndButtons = new List<(GameObject, Button)>() { (seekPanel, seekerButton), (fleePanel, fleerButton) };
 
 
-                seekerMassTuple = GetStatTuple(seekPanelContent, parentName: "Mass", initialValue: defaultSeekerMass, minValue: 1, maxValue: 10, intOnly: true);
-                seekerMaxForceTuple = GetStatTuple(seekPanelContent, parentName: "Max Force", initialValue: defaultSeekerMaxForce, minValue: 1, maxValue: 10, intOnly: true);
-                seekerMaxSpeedTuple = GetStatTuple(seekPanelContent, parentName: "Max Speed", initialValue: defaultSeekerMaxSpeed, minValue: 1, maxValue: 10, intOnly: true);
-                seekerStayInBoundTuple = GetStatTuple(seekPanelContent, parentName: "Stay in Bounds Weight", initialValue: defaultSeekerStayInBound, minValue: 1, maxValue: 10, intOnly: true);
-                seekerWeightTuple = GetStatTuple(seekPanelContent, parentName: "Seeker Weight", initialValue: defaultSeekerWeight, minValue: 1, maxValue: 10, intOnly: true); 
-                seekerStayInBoundsFutureTimeTuple = GetStatTuple(seekPanelContent, parentName: "Future Time", initialValue: defaultSeekerFutureTime, minValue: 1, maxValue: 10, intOnly: true);
+                seekerMassTuple = GetStatTuple(seekPanelContent, parentName: "Mass", initialValue: defaultSeekerMass);
+                seekerMaxForceTuple = GetStatTuple(seekPanelContent, parentName: "Max Force", initialValue: defaultSeekerMaxForce);
+                seekerMaxSpeedTuple = GetStatTuple(seekPanelContent, parentName: "Max Speed", initialValue: defaultSeekerMaxSpeed);
+                seekerStayInBoundTuple = GetStatTuple(seekPanelContent, parentName: "Stay in Bounds Weight", initialValue: defaultSeekerStayInBound);
+                seekerWeightTuple = GetStatTuple(seekPanelContent, parentName: "Seeker Weight", initialValue: defaultSeekerWeight); 
+                seekerStayInBoundsFutureTimeTuple = GetStatTuple(seekPanelContent, parentName: "Future Time", initialValue: defaultSeekerFutureTime);
 
-                fleerMassTuple = GetStatTuple(fleePanelContent, parentName: "Mass", initialValue: defaultFleerMass, minValue: 1, maxValue: 10, intOnly: true);
-                fleerMaxForceTuple = GetStatTuple(fleePanelContent, parentName: "Max Force", initialValue: defaultFleerMaxForce, minValue: 1, maxValue: 10, intOnly: true);
-                fleerMaxSpeedTuple = GetStatTuple(fleePanelContent, parentName: "Max Speed", initialValue: defaultFleerMaxSpeed, minValue: 1, maxValue: 10, intOnly: true);
-                fleerStayInBoundTuple = GetStatTuple(fleePanelContent, parentName: "Stay in Bounds Weight", initialValue: defaultFleerStayInBound, minValue: 1, maxValue: 10, intOnly: true);
-                fleerWeightTuple = GetStatTuple(fleePanelContent, parentName: "Flee Weight", initialValue: defaultFleerWeight, minValue: 1, maxValue: 10, intOnly: true); 
-                fleerStayInBoundsFutureTimeTuple = GetStatTuple(fleePanelContent, parentName: "Future Time", initialValue: defaultFleerWeight, minValue: 1, maxValue: 10, intOnly: true);
+                fleerMassTuple = GetStatTuple(fleePanelContent, parentName: "Mass", initialValue: defaultFleerMass);
+                fleerMaxForceTuple = GetStatTuple(fleePanelContent, parentName: "Max Force", initialValue: defaultFleerMaxForce);
+                fleerMaxSpeedTuple = GetStatTuple(fleePanelContent, parentName: "Max Speed", initialValue: defaultFleerMaxSpeed);
+                fleerStayInBoundTuple = GetStatTuple(fleePanelContent, parentName: "Stay in Bounds Weight", initialValue: defaultFleerStayInBound);
+                fleerWeightTuple = GetStatTuple(fleePanelContent, parentName: "Flee Weight", initialValue: defaultFleerWeight); 
+                fleerStayInBoundsFutureTimeTuple = GetStatTuple(fleePanelContent, parentName: "Future Time", initialValue: defaultFleerWeight);
                 ShowSeekPanel();
                 break;
             case SceneChecker.WandererTest:
+            case SceneChecker.ObstacleAvoidanceTest:
                 contentTransform = canvasGameObject.transform.Find("Panel/Scroll Area/Content");
-                wandererMassTuple = GetStatTuple(transform: contentTransform, parentName: "Mass", initialValue: defaultWandererMass, minValue: 1, maxValue: 10, intOnly: true);
-                wandererMaxForceTuple = GetStatTuple(transform: contentTransform, parentName: "Max Force", initialValue: defaultWandererMaxForce, minValue: 1, maxValue: 10, intOnly: true);
-                wandererMaxSpeedTuple = GetStatTuple(transform: contentTransform, parentName: "Max Speed", initialValue: defaultWandererMaxSpeed, minValue: 1, maxValue: 10, intOnly: true);
-                wandererStayInBoundsFutureTimeTuple = GetStatTuple(transform: contentTransform, parentName: "Stay In Bounds Future Time", initialValue: defaultWandererStayInBoundsFutureTime, minValue: 1, maxValue: 10, intOnly: true);
-                wandererStayInBoundsWeightTuple = GetStatTuple(transform: contentTransform, parentName: "Stay in Bounds Weight", initialValue: defaultWandererStayInBoundsWeight, minValue: 1, maxValue: 10, intOnly: true);
-                wandererWanderCircleRadiusTuple = GetStatTuple(transform: contentTransform, parentName: "Wander Circle Radius", initialValue: defaultWandererWanderCircleRadius, minValue: 1, maxValue: 5, intOnly: true);
-                wandererWanderOffsetTuple = GetStatTuple(transform: contentTransform, parentName: "Wander Offset", initialValue: defaultWandererWanderOffset, minValue: 1, maxValue: 100, intOnly: true);
-                wandererWanderTimeTuple = GetStatTuple(transform: contentTransform, parentName: "Wander Time", initialValue: defaultWandererWanderTime, minValue: 1, maxValue: 10, intOnly: false);
-                wandererWanderWeightTuple = GetStatTuple(transform: contentTransform, parentName: "Wander Weight", initialValue: defaultWandererWanderWeight, minValue: 1, maxValue: 10, intOnly: true); 
-                wandererWanderFutureTimeTuple = GetStatTuple(transform: contentTransform, parentName: "Wander Future Time", initialValue: defaultWandererWanderFutureTime, minValue: 1, maxValue: 10, intOnly: true);
+                wandererMassTuple = GetStatTuple(transform: contentTransform, parentName: "Mass", initialValue: defaultWandererMass);
+                wandererMaxForceTuple = GetStatTuple(transform: contentTransform, parentName: "Max Force", initialValue: defaultWandererMaxForce);
+                wandererMaxSpeedTuple = GetStatTuple(transform: contentTransform, parentName: "Max Speed", initialValue: defaultWandererMaxSpeed);
+                wandererStayInBoundsFutureTimeTuple = GetStatTuple(transform: contentTransform, parentName: "Stay In Bounds Future Time", initialValue: defaultWandererStayInBoundsFutureTime);
+                wandererStayInBoundsWeightTuple = GetStatTuple(transform: contentTransform, parentName: "Stay in Bounds Weight", initialValue: defaultWandererStayInBoundsWeight);
+                wandererWanderCircleRadiusTuple = GetStatTuple(transform: contentTransform, parentName: "Wander Circle Radius", initialValue: defaultWandererWanderCircleRadius, maxValue: 5);
+                wandererWanderOffsetTuple = GetStatTuple(transform: contentTransform, parentName: "Wander Offset", initialValue: defaultWandererWanderOffset, maxValue: 100);
+                wandererWanderTimeTuple = GetStatTuple(transform: contentTransform, parentName: "Wander Time", initialValue: defaultWandererWanderTime, intOnly: false);
+                wandererWanderWeightTuple = GetStatTuple(transform: contentTransform, parentName: "Wander Weight", initialValue: defaultWandererWanderWeight); 
+                wandererWanderFutureTimeTuple = GetStatTuple(transform: contentTransform, parentName: "Wander Future Time", initialValue: defaultWandererWanderFutureTime);
+
+                if(sceneChecker == SceneChecker.ObstacleAvoidanceTest)
+                {
+                    wandererObstacleAvoidanceWeightTuple = GetStatTuple(transform: contentTransform, parentName: "Obstacle Avoidance Weight", initialValue: defaultWandererObstacleAvoidanceWeight);
+                }
                 break;
 
         }
@@ -147,11 +154,12 @@ public class UIManager : MonoBehaviour
                 break;
 
             case SceneChecker.WandererTest:
+            case SceneChecker.ObstacleAvoidanceTest:
                 UpdateWandererStats();
                 break;
         }
     }
-    private (Slider, Text) GetStatTuple(Transform transform, string parentName, float initialValue, float minValue, float maxValue, bool intOnly)
+    private (Slider, Text) GetStatTuple(Transform transform, string parentName, float initialValue, float minValue = 1, float maxValue = 10, bool intOnly = true)
     {
         Transform parent = transform.Find(parentName);
         Slider slider = parent.Find("Slider").GetComponent<Slider>();
@@ -182,7 +190,6 @@ public class UIManager : MonoBehaviour
     
     private void UpdateSeekerStats()
     {
-
         gameManagerScript.seekerMass = UpdateStats(seekerMassTuple);
         gameManagerScript.seekerMaxForce = UpdateStats(seekerMaxForceTuple);
         gameManagerScript.seekerMaxSpeed = UpdateStats(seekerMaxSpeedTuple);
@@ -192,7 +199,6 @@ public class UIManager : MonoBehaviour
     }
     private void UpdateFleerStats()
     {
-
         gameManagerScript.fleerMass = UpdateStats(fleerMassTuple);
         gameManagerScript.fleerMaxForce = UpdateStats(fleerMaxForceTuple);
         gameManagerScript.fleerMaxSpeed = UpdateStats(fleerMaxSpeedTuple);
@@ -212,6 +218,11 @@ public class UIManager : MonoBehaviour
         gameManagerScript.wandererWanderTime = UpdateStats(wandererWanderTimeTuple);
         gameManagerScript.wandererWanderWeight = UpdateStats(wandererWanderWeightTuple); 
         gameManagerScript.wandererStayInBoundsFutureTime = UpdateStats(wandererStayInBoundsFutureTimeTuple);
+
+        if(sceneChecker == SceneChecker.ObstacleAvoidanceTest)
+        {
+            gameManagerScript.wandererObstacleAvoidanceWeight = UpdateStats(wandererObstacleAvoidanceWeightTuple);
+        }
     }
     public void ShowSeekPanel()
     {

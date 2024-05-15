@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
     {
         SeekerTest,
         FleerTest,
+        ObstacleAvoidanceTest,
         WandererTest
     }
 
@@ -42,7 +43,7 @@ public class GameManager : MonoBehaviour
     [NonSerialized]
     public float fleerStayInBoundsFutureTime, fleerMass, fleerMaxForce, fleerMaxSpeed, fleerWeight, fleerStayInBoundsWeight;
     [NonSerialized]
-    public float wandererStayInBoundsFutureTime, wandererWanderFutureTime, wandererMass, wandererMaxForce, wandererMaxSpeed, wandererStayInBoundsWeight, wandererWanderWeight, wandererWanderCircleRadius, wandererWanderOffset, wandererWanderTime;
+    public float wandererObstacleAvoidanceWeight, wandererStayInBoundsFutureTime, wandererWanderFutureTime, wandererMass, wandererMaxForce, wandererMaxSpeed, wandererStayInBoundsWeight, wandererWanderWeight, wandererWanderCircleRadius, wandererWanderOffset, wandererWanderTime;
     #endregion
 
     #region Screen Position
@@ -53,39 +54,40 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         collisionChecker = GetComponent<CollisionChecker>();
-        if (sceneChecker == SceneChecker.SeekerTest)
+        switch (sceneChecker)
         {
-            dummy = Instantiate(dumbPrefab);
-            dummy.transform.position = GetRandomPosition();
+            case SceneChecker.SeekerTest:
+                dummy = Instantiate(dumbPrefab);
+                dummy.transform.position = GetRandomPosition();
 
-            seeker = Instantiate(seekerPrefab);
-            seeker.transform.position = GetRandomPosition();
-            seekerComponent = seeker.GetComponent<Seeker>();
-            seekerComponent.Target = dummy;
+                seeker = Instantiate(seekerPrefab);
+                seeker.transform.position = GetRandomPosition();
+                seekerComponent = seeker.GetComponent<Seeker>();
+                seekerComponent.Target = dummy;
 
-            collisionChecker.SetSceneChecker((int)sceneChecker);
-            collisionChecker.SetDummyObject(dummy);
-            collisionChecker.SetSeeker(seekerComponent);
-        }
+                collisionChecker.SetSceneChecker((int)sceneChecker);
+                collisionChecker.SetDummyObject(dummy);
+                collisionChecker.SetSeeker(seekerComponent);
+                break;
 
-        else if (sceneChecker == SceneChecker.FleerTest)
-        {
-            fleer = Instantiate(fleerPrefab);
-            seeker = Instantiate(seekerPrefab);
+            case SceneChecker.FleerTest:
+                fleer = Instantiate(fleerPrefab);
+                seeker = Instantiate(seekerPrefab);
 
-            seekerComponent = seeker.GetComponent<Seeker>();
-            seekerComponent.Position = GetRandomPosition();
-            seekerComponent.Target = fleer.gameObject;
+                seekerComponent = seeker.GetComponent<Seeker>();
+                seekerComponent.Position = GetRandomPosition();
+                seekerComponent.Target = fleer.gameObject;
 
-            fleerComponent = fleer.GetComponent<Fleer>();
-            fleerComponent.Position = GetRandomPosition();
-            fleerComponent.Target = seeker.gameObject;
-        }
+                fleerComponent = fleer.GetComponent<Fleer>();
+                fleerComponent.Position = GetRandomPosition();
+                fleerComponent.Target = seeker.gameObject;
+                break;
 
-        else if (sceneChecker == SceneChecker.WandererTest)
-        {
-            wanderer = Instantiate(wandererPrefab);
-            wandererComponent = wanderer.GetComponent<Wanderer>();
+            case SceneChecker.WandererTest:
+            case SceneChecker.ObstacleAvoidanceTest:
+                wanderer = Instantiate(wandererPrefab);
+                wandererComponent = wanderer.GetComponent<Wanderer>();
+                break;
         }
         UpdateAgentWallBounds();
     }
@@ -154,6 +156,11 @@ public class GameManager : MonoBehaviour
         wandererComponent.WanderCircleRadius = wandererWanderCircleRadius;
         wandererComponent.WanderOffset = wandererWanderOffset;
         wandererComponent.WanderTime = wandererWanderTime;
+
+        if(sceneChecker == SceneChecker.ObstacleAvoidanceTest) 
+        {
+            wandererComponent.AvoidObstacleWeight = wandererObstacleAvoidanceWeight;
+        }
     }
     private Vector3 GetRandomPosition()
     {

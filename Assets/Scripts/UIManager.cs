@@ -134,7 +134,7 @@ public class UIManager : MonoBehaviour
 
                 if(sceneChecker == SceneChecker.ObstacleAvoidanceTest)
                 {
-                    wandererAvoidTimeTuple = GetStatTuple(transform: contentTransform, parentName: "Avoid Time", initialValue: defaultWandererAvoidTime);
+                    wandererAvoidTimeTuple = GetStatTuple(transform: contentTransform, parentName: "Avoid Time", initialValue: defaultWandererAvoidTime, minValue: 0f, maxValue: 3f, intOnly: false);
                     wandererObstacleAvoidanceWeightTuple = GetStatTuple(transform: contentTransform, parentName: "Obstacle Avoidance Weight", initialValue: defaultWandererObstacleAvoidanceWeight);
                 }
                 break;
@@ -224,6 +224,7 @@ public class UIManager : MonoBehaviour
 
         if(sceneChecker == SceneChecker.ObstacleAvoidanceTest)
         {
+            gameManagerScript.wandererAvoidTime = UpdateStats(wandererAvoidTimeTuple);
             gameManagerScript.wandererObstacleAvoidanceWeight = UpdateStats(wandererObstacleAvoidanceWeightTuple);
         }
     }

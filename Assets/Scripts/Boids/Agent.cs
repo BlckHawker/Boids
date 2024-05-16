@@ -255,7 +255,6 @@ public abstract class Agent : MonoBehaviour
         //draw stay in bounds
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireCube(Vector2.zero, WallBounds.size);
-        
         //draw stay in bounds future position
         Gizmos.color = Color.magenta;
 
@@ -269,16 +268,22 @@ public abstract class Agent : MonoBehaviour
         Gizmos.DrawWireSphere(wanderFuturePosition, wanderCircleRadius);
         Gizmos.DrawLine(wanderFuturePosition, wanderPosition);
 
-        //draw lines to important obstacles
-        Gizmos.color = Color.red;
-        foreach (Obstacle obstacle in importantObstacles)
-        {
-            Gizmos.DrawLine(obstacle.transform.position, obstacle.transform.position);
-        }
 
         //draw box area to avoid obstacles
-        Vector3 avoidBoxSize = new Vector3(radius * 2f, avoidObstacleFuturePosition.magnitude + radius, radius * 2f);
-        Vector3 boxCenter = new Vector3(0, (avoidObstacleFuturePosition.magnitude + radius) / 2f, 0);
-        Gizmos.DrawWireCube(boxCenter, avoidBoxSize);
+        Gizmos.color = Color.red;
+        if (avoidTime > 0)
+        {
+            Vector3 avoidBoxSize = new Vector3(radius * 2f, avoidObstacleFuturePosition.magnitude + radius, radius * 2f);
+            Vector3 boxCenter = new Vector3(0, (avoidObstacleFuturePosition.magnitude + radius) / 2f, 0);
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.DrawWireCube(boxCenter, avoidBoxSize);
+            Gizmos.matrix = Matrix4x4.identity;
+            //draw lines to important obstacles
+            foreach (Obstacle obstacle in importantObstacles)
+            {
+                Gizmos.DrawLine(obstacle.transform.position, obstacle.transform.position);
+            }
+        }
+
     }
 }

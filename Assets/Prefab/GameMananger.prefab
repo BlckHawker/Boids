@@ -61,7 +61,7 @@ MonoBehaviour:
   defaultFleerMaxSpeed: 10
   defaultFleerWeight: 4
   defaultFleerStayInBound: 4
-  defaultWandererAvoidTime: 0
+  defaultWandererAvoidTime: 1.5
   defaultWandererMass: 0
   defaultWandererMaxForce: 0
   defaultWandererMaxSpeed: 3

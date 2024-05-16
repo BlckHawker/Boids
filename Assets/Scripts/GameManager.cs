@@ -58,7 +58,7 @@ public class GameManager : MonoBehaviour
 
         collisionChecker = GetComponent<CollisionChecker>();
         obstacleManager = GetComponent<ObstacleManager>();
-        obstacleManager.obstacleList = new List<Obstacle>();
+        obstacleManager.ObstacleList = new List<Obstacle>();
         switch (sceneChecker)
         {
             case SceneChecker.SeekerTest:
@@ -164,6 +164,7 @@ public class GameManager : MonoBehaviour
         {
             wandererComponent.AvoidTime = wandererAvoidTime;
             wandererComponent.AvoidObstacleWeight = wandererObstacleAvoidanceWeight;
+            wandererComponent.ObstacleList = obstacleManager.ObstacleList;
         }
     }
     private Vector3 GetRandomPosition()
@@ -189,6 +190,7 @@ public class GameManager : MonoBehaviour
                 fleerComponent.WallBounds = wallBounds;
                 break;
             case SceneChecker.WandererTest:
+            case SceneChecker.ObstacleAvoidanceTest: 
                 wandererComponent.WallBounds = wallBounds;
                 break;
         }

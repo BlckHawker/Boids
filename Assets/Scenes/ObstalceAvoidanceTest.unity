@@ -3502,10 +3502,6 @@ PrefabInstance:
       propertyPath: canvasGameObject
       value: 
       objectReference: {fileID: 1156399789}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: defaultWandererAvoidTime
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8623255771874785623, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
       propertyPath: m_Name
       value: GameMananger

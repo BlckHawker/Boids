@@ -8,7 +8,7 @@ public class ObstacleManager : MonoBehaviour
     [SerializeField]
     private Obstacle obstaclePrefab;
     [NonSerialized]
-    public List<Obstacle> obstacleList = new List<Obstacle>();
+    public List<Obstacle> ObstacleList = new List<Obstacle>();
 
     public void CreateObstacle()
     {

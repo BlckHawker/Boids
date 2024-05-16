@@ -2,19 +2,25 @@ using System;
 using UnityEngine;
 using Rnd = UnityEngine.Random;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 
 public class GameManager : MonoBehaviour
 {
-    private enum SceneChecker
+    public enum SceneChecker
     {
         SeekerTest,
         FleerTest,
+        FlockingTest,
         ObstacleAvoidanceTest,
         WandererTest
     }
 
+    UIManager uiManager;
+
     [SerializeField]
     private SceneChecker sceneChecker;
+    public SceneChecker SceneCheckerProperty { get { return sceneChecker; } }
 
     private CollisionChecker collisionChecker;
     private ObstacleManager obstacleManager;
@@ -38,6 +44,11 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     private Wanderer wandererPrefab;
 
+    [SerializeField]
+    private Flocker flockerPrefab;
+
+    private List<Flocker> flockers;
+
     private GameObject dummy;
     private Agent seeker, fleer, wanderer;
     private Seeker seekerComponent;
@@ -52,6 +63,8 @@ public class GameManager : MonoBehaviour
     public float fleerStayInBoundsFutureTime, fleerMass, fleerMaxForce, fleerMaxSpeed, fleerWeight, fleerStayInBoundsWeight;
     [NonSerialized]
     public float wandererAvoidTime, wandererObstacleAvoidanceWeight, wandererStayInBoundsFutureTime, wandererWanderFutureTime, wandererMass, wandererMaxForce, wandererMaxSpeed, wandererStayInBoundsWeight, wandererWanderWeight, wandererWanderCircleRadius, wandererWanderOffset, wandererWanderTime;
+    [NonSerialized]
+    public float flockerSeparateWeight, flockerSeparateDistance, flockerMass, flockerMaxForce, flockerMaxSpeed, flockerStayInBoundsFutureTime, flockerStayInBoundsWeight;
     #endregion
 
     #region Screen Position
@@ -64,7 +77,9 @@ public class GameManager : MonoBehaviour
 
         collisionChecker = GetComponent<CollisionChecker>();
         obstacleManager = GetComponent<ObstacleManager>();
+        uiManager = GetComponent<UIManager>();
         obstacleManager.ObstacleList = new List<Obstacle>();
+        flockers = new List<Flocker>();
         switch (sceneChecker)
         {
             case SceneChecker.SeekerTest:
@@ -76,7 +91,6 @@ public class GameManager : MonoBehaviour
                 seekerComponent = seeker.GetComponent<Seeker>();
                 seekerComponent.Target = dummy;
 
-                collisionChecker.SetSceneChecker((int)sceneChecker);
                 collisionChecker.SetDummyObject(dummy);
                 collisionChecker.SetSeeker(seekerComponent);
                 break;
@@ -99,6 +113,20 @@ public class GameManager : MonoBehaviour
                 wanderer = Instantiate(wandererPrefab);
                 wandererComponent = wanderer.GetComponent<Wanderer>();
                 break;
+
+            case SceneChecker.FlockingTest:
+                for (int i = 0; i < uiManager.FlockerCount; i++)
+                {
+                    Flocker flocker = Instantiate(flockerPrefab);
+                    flocker.Position = GetRandomPosition();
+                    flockers.Add(flocker);
+                }
+                
+                foreach (Flocker flocker in flockers)
+                {
+                    flocker.SeparateAgentList = flockers.Select(f => (Agent)f).ToList();
+                }
+            break;
         }
         UpdateAgentWallBounds();
     }
@@ -111,10 +139,6 @@ public class GameManager : MonoBehaviour
             case SceneChecker.SeekerTest:
                 if(collisionChecker.CircleCollision())
                     dummy.transform.position = GetRandomPosition();
-                break;
-            case SceneChecker.FleerTest:
-                break;
-            case SceneChecker.WandererTest:
                 break;
         }
     }
@@ -130,9 +154,12 @@ public class GameManager : MonoBehaviour
                 UpdateFleerValues(); 
                 break;
             case SceneChecker.WandererTest: 
-            case SceneChecker.ObstacleAvoidanceTest: 
+            case SceneChecker.ObstacleAvoidanceTest:
                 UpdateWandererValues(); 
                 break;
+            case SceneChecker.FlockingTest:
+                UpdateFlockerValues();
+            break;
         }
     }
     private void UpdateSeekerValues()
@@ -171,6 +198,20 @@ public class GameManager : MonoBehaviour
             wandererComponent.AvoidTime = wandererAvoidTime;
             wandererComponent.AvoidObstacleWeight = wandererObstacleAvoidanceWeight;
             wandererComponent.ObstacleList = obstacleManager.ObstacleList;
+        }
+    }
+
+    private void UpdateFlockerValues()
+    {
+        foreach (Flocker flocker in flockers)
+        {
+            flocker.Mass = flockerMass;
+            flocker.SeparateDistance = flockerSeparateDistance;
+            flocker.SeparateWeight = flockerSeparateWeight;
+            flocker.MaxForce = flockerMaxForce;
+            flocker.MaxSpeed = flockerMaxSpeed;
+            flocker.StayInBoundsFutureTime = flockerStayInBoundsFutureTime;
+            flocker.StayInBoundsWeight = flockerStayInBoundsWeight;
         }
     }
     private Vector3 GetRandomPosition()

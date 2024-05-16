@@ -6,24 +6,15 @@ using UnityEngine;
 
 public class CollisionChecker : MonoBehaviour
 {
-    private enum SceneChecker
-    {
-        SeekerTest
-    }
-    private SceneChecker sceneChecker;
     private Agent seeker;
     private GameObject dummyObject; //object that doesn't move
     private float dummyObjectRadius;
+    private GameManager gameManager;
 
     // Start is called before the first frame update
     void Start()
     {
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        gameManager = GetComponent<GameManager>();
     }
 
     /// <summary>
@@ -32,9 +23,9 @@ public class CollisionChecker : MonoBehaviour
     /// <returns>if the objects are colliding</returns>
     public bool CircleCollision()
     {
-        switch (sceneChecker)
+        switch (gameManager.SceneCheckerProperty)
         {
-            case SceneChecker.SeekerTest:
+            case GameManager.SceneChecker.SeekerTest:
                 return CircleCollision(seeker.Position, seeker.Radius, dummyObject.transform.position, dummyObjectRadius);
         }
 
@@ -55,10 +46,6 @@ public class CollisionChecker : MonoBehaviour
 
 
     #region Setter Methods
-    public void SetSceneChecker(int sceneChecker)
-    {
-        this.sceneChecker = (SceneChecker)sceneChecker;
-    }
 
     public void SetSeeker(Agent seeker)
     {
@@ -76,13 +63,15 @@ public class CollisionChecker : MonoBehaviour
     public void OnDrawGizmos()
     {
         Gizmos.color = Color.yellow;
-
-        switch (sceneChecker)
+        if(Application.isPlaying) 
         {
-            case SceneChecker.SeekerTest:
-                //Gizmos.DrawWireSphere(seeker.Position, seeker.Radius);
-                //Gizmos.DrawWireSphere(dummyObject.transform.position, dummyObjectRadius);
-                break;
+            switch (gameManager.SceneCheckerProperty)
+            {
+                case GameManager.SceneChecker.SeekerTest:
+                    //Gizmos.DrawWireSphere(seeker.Position, seeker.Radius);
+                    //Gizmos.DrawWireSphere(dummyObject.transform.position, dummyObjectRadius);
+                    break;
+            }
         }
     }
 }

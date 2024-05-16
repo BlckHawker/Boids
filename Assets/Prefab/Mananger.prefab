@@ -49,7 +49,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b3bfd3aab811ce4095017bb0e799b6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneChecker: 1
   canvasGameObject: {fileID: 0}
   defaultSeekerFutureTime: 5
   defaultSeekerMass: 0
@@ -75,6 +74,14 @@ MonoBehaviour:
   defaultWandererWanderOffset: 100
   defaultWandererWanderTime: 1
   defaultWandererWanderFutureTime: 7
+  flockerCount: 20
+  defaultFlockerStayInBoundsWeightTuple: 0
+  defaultFlockerStayInBoundsFutureTime: 0
+  defaultFlockerMass: 0
+  defaultFlockerMaxForce: 0
+  defaultFlockerMaxSpeed: 0
+  defaultFlockerSeparateDistance: 0
+  defaultFlockerSeparateWeight: 0
 --- !u!114 &615148651115639377
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -92,6 +99,7 @@ MonoBehaviour:
   seekerPrefab: {fileID: 8160406667041693798, guid: e874ffa99319ae04f9c17703c17a9d65, type: 3}
   fleerPrefab: {fileID: 3305228377004344979, guid: 69f1f517e2f522249b4ddc242c1608fd, type: 3}
   wandererPrefab: {fileID: 9126634872697412385, guid: 0162a45cd0555c84ebaf189ccdd4346e, type: 3}
+  flockerPrefab: {fileID: 3834047019113710115, guid: e5bafb2c47bb5e64b8e9f92f900f0f72, type: 3}
   camera: {fileID: 0}
 --- !u!114 &7230900674605804661
 MonoBehaviour:
@@ -130,6 +138,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e16f52535796fd4391ed415e0d5d8b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainCamera: {fileID: 0}
+  canvasWidth: 0.32
+  canvasHeight: 0.65
 --- !u!114 &4966087475823519247
 MonoBehaviour:
   m_ObjectHideFlags: 0

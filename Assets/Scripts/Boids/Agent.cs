@@ -54,10 +54,14 @@ public abstract class Agent : MonoBehaviour
     private float separateDistance;
     private List<Obstacle> obstacleList;
     public List<Obstacle> ObstacleList { set { obstacleList = value; } }
-    private List<Agent> separateAgentList;
-    private List<Agent> importantSeparateAgentList;
+    private List<Agent> separateAgentList, alignAgentList;
+    private List<Agent> importantSeparateAgentList, importantAlignAgentList;
+    
     public List<Agent> SeparateAgentList { set { separateAgentList = value; } }
+    public List<Agent> AlignAgentList { set { alignAgentList = value; } }
+
     private List<Obstacle> importantObstacles = new List<Obstacle>(); // a list of obstacles that are "close enough"
+    
     private float avoidTime; // how far ahead in the future should we care about avoiding obstacles
     [NonSerialized]
     public Vector2 Position;
@@ -73,6 +77,7 @@ public abstract class Agent : MonoBehaviour
     {
         importantObstacles = new List<Obstacle>();
         importantSeparateAgentList = new List<Agent>();
+        importantAlignAgentList = new List<Agent>();
         radius = transform.localScale.x / 2;
         agentBounds = new Bounds(transform.position, new(radius, radius));
         transform.position = Position;
@@ -280,6 +285,27 @@ public abstract class Agent : MonoBehaviour
 
         //divide by the average
         return importantSeparateAgentList.Count == 0 ? Vector2.zero : steeringForce / importantSeparateAgentList.Count;
+    }
+
+    protected Vector2 Align()
+    {
+        //find the average of all of the agent's velocities (including possiibly yourself)
+        Vector2 desiredVelocity = Vector2.zero;
+        foreach (Agent agent in alignAgentList)
+        {
+            desiredVelocity += agent.velocity;
+        }
+
+        if (alignAgentList.Count == 0)
+            return Vector2.zero;
+
+
+        desiredVelocity /= alignAgentList.Count;
+            
+
+        desiredVelocity = desiredVelocity.normalized * maxSpeed;
+
+        return desiredVelocity - velocity;
     }
     protected void ApplyForce(Vector2 force)
     {

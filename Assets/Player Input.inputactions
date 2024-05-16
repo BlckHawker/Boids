@@ -1,0 +1,34 @@
+{
+    "name": "Player Input",
+    "maps": [
+        {
+            "name": "Player",
+            "id": "fdcbc329-1377-4ebd-b95f-0e7f803d5cd7",
+            "actions": [
+                {
+                    "name": "Create Circle",
+                    "type": "Button",
+                    "id": "73001423-77a2-465d-b43d-57f6ec2490ce",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "f734bd56-1012-434b-af7e-159b6664d080",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Create Circle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

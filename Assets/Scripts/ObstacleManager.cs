@@ -10,8 +10,16 @@ public class ObstacleManager : MonoBehaviour
     [NonSerialized]
     public List<Obstacle> ObstacleList = new List<Obstacle>();
 
-    public void CreateObstacle()
+    public void CreateObstacle(Vector3 position)
     {
+        Obstacle prefab = Instantiate(obstaclePrefab, position, Quaternion.identity);
+        ObstacleList.Add(prefab);
+    }
 
+    public void ClearObstacles()
+    {
+        foreach (Obstacle obstacle in ObstacleList)
+            Destroy(obstacle.gameObject);
+        ObstacleList.Clear();
     }
 }

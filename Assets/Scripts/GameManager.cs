@@ -19,6 +19,12 @@ public class GameManager : MonoBehaviour
     private CollisionChecker collisionChecker;
     private ObstacleManager obstacleManager;
 
+    public Vector2 CameraWdithHeight { get {
+            float height = 2f * camera.orthographicSize;
+            float width = height * camera.aspect;
+            return new Vector2(width, height);
+        } }
+
     #region Prefabs
     [SerializeField]
     private GameObject dumbPrefab; //object that doesn't move
@@ -176,9 +182,7 @@ public class GameManager : MonoBehaviour
 
     private void UpdateAgentWallBounds()
     {
-        float height = 2f * camera.orthographicSize;
-        float width = height * camera.aspect;
-        Bounds wallBounds = new Bounds(Vector2.zero, new Vector2(width, height));
+        Bounds wallBounds = new Bounds(Vector2.zero, CameraWdithHeight);
 
         switch (sceneChecker)
         {

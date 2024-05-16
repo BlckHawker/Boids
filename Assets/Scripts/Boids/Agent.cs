@@ -65,6 +65,7 @@ public abstract class Agent : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        importantObstacles = new List<Obstacle>();
         radius = transform.localScale.x / 2;
         agentBounds = new Bounds(transform.position, new(radius, radius));
         transform.position = Position;
@@ -191,10 +192,10 @@ public abstract class Agent : MonoBehaviour
     protected Vector2 AvoidObstacles()
     {
         Vector2 steeringForce = Vector2.zero;
-        importantObstacles = new List<Obstacle>();
+        importantObstacles.Clear();
         foreach (Obstacle obstacle in obstacleList)
-        { 
-            Vector2 obstacleToAgent = Position - (Vector2)obstacle.transform.position;
+        {
+            Vector2 obstacleToAgent = (Vector2)obstacle.transform.position - Position;
             float forwardDot = Vector2.Dot(direction, obstacleToAgent);
             float rightDot = Vector2.Dot(transform.right, obstacleToAgent);
 
@@ -225,10 +226,11 @@ public abstract class Agent : MonoBehaviour
             //for debugging purposes, add this obstacle to the list of important obstcles
             importantObstacles.Add(obstacle);
 
+
             Vector2 desiredVelocity = Vector2.zero;
 
             //if the dot product is negative, the object is to the left and the vehicle has to move to the right (scale the weight based on distance)
-            if (rightDot > 0)
+            if (rightDot < 0)
             {
                 desiredVelocity = transform.right * maxSpeed * (1f / obstacleToAgent.magnitude);
             }
@@ -279,9 +281,10 @@ public abstract class Agent : MonoBehaviour
             Gizmos.DrawWireCube(boxCenter, avoidBoxSize);
             Gizmos.matrix = Matrix4x4.identity;
             //draw lines to important obstacles
+            Debug.Log("important obstacles count: " + importantObstacles.Count);
             foreach (Obstacle obstacle in importantObstacles)
             {
-                Gizmos.DrawLine(obstacle.transform.position, obstacle.transform.position);
+                Gizmos.DrawLine(Position, obstacle.transform.position);
             }
         }
 

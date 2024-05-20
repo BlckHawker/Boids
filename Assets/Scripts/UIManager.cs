@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,7 +13,7 @@ public class UIManager : MonoBehaviour
     private (Slider, Text) seekerStayInBoundsFutureTimeTuple, seekerMassTuple, seekerMaxForceTuple, seekerMaxSpeedTuple, seekerWeightTuple, seekerStayInBoundTuple;
     private (Slider, Text) fleerStayInBoundsFutureTimeTuple, fleerMassTuple, fleerMaxForceTuple, fleerMaxSpeedTuple, fleerWeightTuple, fleerStayInBoundTuple;
     private (Slider, Text) wandererAvoidTimeTuple, wandererStayInBoundsFutureTimeTuple, wandererWanderFutureTimeTuple, wandererMassTuple, wandererMaxForceTuple, wandererMaxSpeedTuple, wandererObstacleAvoidanceWeightTuple, wandererStayInBoundsWeightTuple, wandererWanderWeightTuple, wandererWanderCircleRadiusTuple, wandererWanderOffsetTuple, wandererWanderTimeTuple;
-    private (Slider, Text) flockerStayInBoundsFutureTimeTuple, flockerMassTuple, flockerMaxForceTuple, flockerMaxSpeedTuple, flockerSeparateDistanceTuple, flockerSeparateWeightTuple, flockerStayInBoundsWeightTuple;
+    private (Slider, Text) flockerAlignDistanceTuple, flockerAlignWeightTuple, flockerStayInBoundsFutureTimeTuple, flockerMassTuple, flockerMaxForceTuple, flockerMaxSpeedTuple, flockerSeparateDistanceTuple, flockerSeparateWeightTuple, flockerStayInBoundsWeightTuple;
     #region Seeker Values
     [Header("Seeker Values")]
     [SerializeField, Range(1, 10)]
@@ -61,6 +62,10 @@ public class UIManager : MonoBehaviour
 
     #region Flocker Values
     [Header("Flocker Values")]
+    [SerializeField, Range(1f, 5f)]
+    private float defaultFlockerAlignDistance;
+    [SerializeField, Range(1, 10)]
+    private int defaultFlockerAlignWeight;
     [SerializeField]
     private int flockerCount;
     [SerializeField, Range(1, 10)]
@@ -100,7 +105,6 @@ public class UIManager : MonoBehaviour
                 seekerWeightTuple = GetStatTuple(contentTransform, parentName: "Seeker Weight", initialValue: defaultSeekerWeight);
                 seekerStayInBoundTuple = GetStatTuple(contentTransform, parentName: "Stay in Bounds Weight", initialValue: defaultSeekerStayInBound);
                 break;
-
             case GameManager.SceneChecker.FleerTest:
                 Transform statPanel = canvasGameObject.transform.Find("Stat Panel");
                 fleePanel = statPanel.Find("Flee Panel").gameObject;
@@ -149,9 +153,10 @@ public class UIManager : MonoBehaviour
                     wandererObstacleAvoidanceWeightTuple = GetStatTuple(transform: contentTransform, parentName: "Obstacle Avoidance Weight", initialValue: defaultWandererObstacleAvoidanceWeight);
                 }
                 break;
-
             case GameManager.SceneChecker.FlockingTest:
                 contentTransform = canvasGameObject.transform.Find("Panel/Scroll Area/Content");
+                flockerAlignDistanceTuple = GetStatTuple(transform: contentTransform, parentName: "Align Distance", initialValue: defaultFlockerAlignDistance, minValue: 1, maxValue: 5, intOnly: false);
+                flockerAlignWeightTuple = GetStatTuple(transform: contentTransform, parentName: "Align Weight", initialValue: defaultFlockerAlignWeight, minValue: 0);
                 flockerMassTuple = GetStatTuple(transform: contentTransform, parentName: "Mass", initialValue: defaultFlockerMass);
                 flockerMaxForceTuple = GetStatTuple(transform: contentTransform, parentName: "Max Force", initialValue: defaultFlockerMaxForce);
                 flockerMaxSpeedTuple = GetStatTuple(transform: contentTransform, parentName: "Max Speed", initialValue: defaultFlockerMaxSpeed);
@@ -245,9 +250,10 @@ public class UIManager : MonoBehaviour
             gameManager.wandererObstacleAvoidanceWeight = UpdateStats(wandererObstacleAvoidanceWeightTuple);
         }
     }
-
     private void UpdateFlockerStats()
     {
+        gameManager.flockerAlignDistance = UpdateStats(flockerAlignDistanceTuple);
+        gameManager.flockerAlignWeight = UpdateStats(flockerAlignWeightTuple);
         gameManager.flockerMass = UpdateStats(flockerMassTuple);
         gameManager.flockerMaxForce = UpdateStats(flockerMaxForceTuple);
         gameManager.flockerMaxSpeed = UpdateStats(flockerMaxSpeedTuple);

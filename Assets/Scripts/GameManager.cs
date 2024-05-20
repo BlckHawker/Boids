@@ -64,7 +64,7 @@ public class GameManager : MonoBehaviour
     [NonSerialized]
     public float wandererAvoidTime, wandererObstacleAvoidanceWeight, wandererStayInBoundsFutureTime, wandererWanderFutureTime, wandererMass, wandererMaxForce, wandererMaxSpeed, wandererStayInBoundsWeight, wandererWanderWeight, wandererWanderCircleRadius, wandererWanderOffset, wandererWanderTime;
     [NonSerialized]
-    public float flockerSeparateWeight, flockerSeparateDistance, flockerMass, flockerMaxForce, flockerMaxSpeed, flockerStayInBoundsFutureTime, flockerStayInBoundsWeight;
+    public float flockerAlignDistance, flockerAlignWeight, flockerSeparateWeight, flockerSeparateDistance, flockerMass, flockerMaxForce, flockerMaxSpeed, flockerStayInBoundsFutureTime, flockerStayInBoundsWeight;
     #endregion
 
     #region Screen Position
@@ -124,7 +124,7 @@ public class GameManager : MonoBehaviour
                 
                 foreach (Flocker flocker in flockers)
                 {
-                    flocker.SeparateAgentList = flockers.Select(f => (Agent)f).ToList();
+                    flocker.FlockingList = flockers.Select(f => (Agent)f).ToList();
                 }
             break;
         }
@@ -212,6 +212,8 @@ public class GameManager : MonoBehaviour
             flocker.MaxSpeed = flockerMaxSpeed;
             flocker.StayInBoundsFutureTime = flockerStayInBoundsFutureTime;
             flocker.StayInBoundsWeight = flockerStayInBoundsWeight;
+            flocker.AlignDistance = flockerAlignDistance;
+            flocker.AlignWeight = flockerAlignWeight;
         }
     }
     private Vector3 GetRandomPosition()

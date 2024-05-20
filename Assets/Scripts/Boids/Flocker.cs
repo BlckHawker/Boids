@@ -10,6 +10,7 @@ public class Flocker : Agent
 
         totalForce += StayInBounds() * stayInBoundsWeight;
         totalForce += Separate() * separateWeight;
+        totalForce += Align() * alignWeight;
         totalForce = Vector2.ClampMagnitude(totalForce, MaxForce);
 
         ApplyForce(totalForce);

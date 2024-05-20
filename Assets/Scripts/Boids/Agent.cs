@@ -3,13 +3,16 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 using rnd = UnityEngine.Random;
 public abstract class Agent : MonoBehaviour
 {
     #region Force Weights
-    protected float seekWeight, fleerWeight, wanderWeight, stayInBoundsWeight, avoidObstacleWeight, separateWeight;
+    protected float seekWeight, fleerWeight, wanderWeight, stayInBoundsWeight, avoidObstacleWeight, separateWeight, alignWeight;
 
     #region Setters
+    public float AlignDistance { set { alignDistance = value; } }
+    public float AlignWeight { set { alignWeight = value; } }
     public float SeparateDistance { set { separateDistance = value; } }
     public float SeparateWeight { set { separateWeight = value; } }
     public float AvoidObstacleWeight { set { avoidObstacleWeight = value;  } }
@@ -51,14 +54,14 @@ public abstract class Agent : MonoBehaviour
     private Vector2 wanderPosition;
     #endregion
     protected Vector2 velocity, acceleration;
-    private float separateDistance;
+    private float separateDistance, alignDistance;
     private List<Obstacle> obstacleList;
     public List<Obstacle> ObstacleList { set { obstacleList = value; } }
-    private List<Agent> separateAgentList, alignAgentList;
+    private List<Agent> flockingList;
     private List<Agent> importantSeparateAgentList, importantAlignAgentList;
     
-    public List<Agent> SeparateAgentList { set { separateAgentList = value; } }
-    public List<Agent> AlignAgentList { set { alignAgentList = value; } }
+   
+    public List<Agent> FlockingList { set { flockingList = value; } }
 
     private List<Obstacle> importantObstacles = new List<Obstacle>(); // a list of obstacles that are "close enough"
     
@@ -263,7 +266,7 @@ public abstract class Agent : MonoBehaviour
     {
         Vector2 steeringForce = Vector2.zero;
         importantSeparateAgentList.Clear();
-        foreach (Agent neighbor in separateAgentList) 
+        foreach (Agent neighbor in flockingList) 
         {
             //be sure you are not seperating from yourself
             if (neighbor == this)
@@ -289,20 +292,38 @@ public abstract class Agent : MonoBehaviour
 
     protected Vector2 Align()
     {
-        //find the average of all of the agent's velocities (including possiibly yourself)
+        
         Vector2 desiredVelocity = Vector2.zero;
-        foreach (Agent agent in alignAgentList)
+        importantAlignAgentList.Clear();
+
+        //find all neighbors that are "close enough" to align to
+        foreach (Agent neighbor in flockingList)
         {
-            desiredVelocity += agent.velocity;
+            //don't include yourself
+            if(neighbor == this)
+                continue;
+
+            //only look at obstacles that are "close enough"
+            Vector2 neighborToAgent = Position - neighbor.Position;
+            float distance = neighborToAgent.magnitude;
+
+            if (distance > alignDistance)
+                continue;
+
+            importantAlignAgentList.Add(neighbor);
         }
 
-        if (alignAgentList.Count == 0)
+        if (importantAlignAgentList.Count == 0)
             return Vector2.zero;
 
+        //find the average of all of the agent's velocities that are in range (excluding yourself)
+        foreach (Agent neighbor in importantAlignAgentList)
+        {
+            desiredVelocity += neighbor.velocity;
+        }
 
-        desiredVelocity /= alignAgentList.Count;
+        desiredVelocity /= flockingList.Count;
             
-
         desiredVelocity = desiredVelocity.normalized * maxSpeed;
 
         return desiredVelocity - velocity;

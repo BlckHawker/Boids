@@ -8,12 +8,17 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
+    //todo: set the enabled colors of the tuples during initalization
+    //todo: make it so forces don't apply if the force check box is disabled
+    [SerializeField]
+    private Color enabledTupleColor, disabledTupleColor;
     [SerializeField]
     private GameObject canvasGameObject;
     private (Slider, Text) seekerStayInBoundsFutureTimeTuple, seekerMassTuple, seekerMaxForceTuple, seekerMaxSpeedTuple, seekerWeightTuple, seekerStayInBoundTuple;
     private (Slider, Text) fleerStayInBoundsFutureTimeTuple, fleerMassTuple, fleerMaxForceTuple, fleerMaxSpeedTuple, fleerWeightTuple, fleerStayInBoundTuple;
     private (Slider, Text) wandererAvoidTimeTuple, wandererStayInBoundsFutureTimeTuple, wandererWanderFutureTimeTuple, wandererMassTuple, wandererMaxForceTuple, wandererMaxSpeedTuple, wandererObstacleAvoidanceWeightTuple, wandererStayInBoundsWeightTuple, wandererWanderWeightTuple, wandererWanderCircleRadiusTuple, wandererWanderOffsetTuple, wandererWanderTimeTuple;
     private (Slider, Text) flockerAlignDistanceTuple, flockerAlignWeightTuple, flockerStayInBoundsFutureTimeTuple, flockerMassTuple, flockerMaxForceTuple, flockerMaxSpeedTuple, flockerSeparateDistanceTuple, flockerSeparateWeightTuple, flockerStayInBoundsWeightTuple;
+    private (Toggle, Text) flockerAlignForceTuple, flockerSeparateForceTuple, flockerStayInBoundsForceTuple;
     #region Seeker Values
     [Header("Seeker Values")]
     [SerializeField, Range(1, 10)]
@@ -62,6 +67,13 @@ public class UIManager : MonoBehaviour
 
     #region Flocker Values
     [Header("Flocker Values")]
+    [SerializeField]
+    private bool defaultFlockerAlignForce;
+    [SerializeField]
+    private bool defaultFlockerSeparateForce;
+    [SerializeField]
+    private bool defaultFlockerStayInBoundsForce;
+
     [SerializeField, Range(1f, 5f)]
     private float defaultFlockerAlignDistance;
     [SerializeField, Range(1, 10)]
@@ -80,7 +92,7 @@ public class UIManager : MonoBehaviour
     private int defaultFlockerMaxSpeed;
     [SerializeField, Range(1f, 5f)]
     private float defaultFlockerSeparateDistance;
-    [SerializeField, Range(0, 10)]
+    [SerializeField, Range(1, 10)]
     private int defaultFlockerSeparateWeight;
     public int FlockerCount { get { return flockerCount; } }
     #endregion
@@ -156,14 +168,21 @@ public class UIManager : MonoBehaviour
             case GameManager.SceneChecker.FlockingTest:
                 contentTransform = canvasGameObject.transform.Find("Panel/Scroll Area/Content");
                 flockerAlignDistanceTuple = GetStatTuple(transform: contentTransform, parentName: "Align Distance", initialValue: defaultFlockerAlignDistance, minValue: 1, maxValue: 5, intOnly: false);
-                flockerAlignWeightTuple = GetStatTuple(transform: contentTransform, parentName: "Align Weight", initialValue: defaultFlockerAlignWeight, minValue: 0);
+                flockerAlignWeightTuple = GetStatTuple(transform: contentTransform, parentName: "Align Weight", initialValue: defaultFlockerAlignWeight);
                 flockerMassTuple = GetStatTuple(transform: contentTransform, parentName: "Mass", initialValue: defaultFlockerMass);
                 flockerMaxForceTuple = GetStatTuple(transform: contentTransform, parentName: "Max Force", initialValue: defaultFlockerMaxForce);
                 flockerMaxSpeedTuple = GetStatTuple(transform: contentTransform, parentName: "Max Speed", initialValue: defaultFlockerMaxSpeed);
                 flockerStayInBoundsFutureTimeTuple = GetStatTuple(transform: contentTransform, parentName: "Stay In Bounds Future Time", initialValue: defaultFlockerStayInBoundsFutureTime);
                 flockerStayInBoundsWeightTuple = GetStatTuple(transform: contentTransform, parentName: "Stay in Bounds Weight", initialValue: defaultFlockerStayInBoundsWeight);
                 flockerSeparateDistanceTuple = GetStatTuple(transform: contentTransform, parentName: "Separate Distance", initialValue: defaultFlockerSeparateDistance, minValue: 1, maxValue: 5, intOnly: false);
-                flockerSeparateWeightTuple = GetStatTuple(transform: contentTransform, parentName: "Separate Weight", initialValue: defaultFlockerSeparateWeight, minValue: 0);
+                flockerSeparateWeightTuple = GetStatTuple(transform: contentTransform, parentName: "Separate Weight", initialValue: defaultFlockerSeparateWeight);
+                flockerAlignForceTuple = GetCheckBoxTuple(transform: contentTransform, parentName: "Align Force", initialValue: defaultFlockerAlignForce);
+                flockerSeparateForceTuple = GetCheckBoxTuple(transform: contentTransform, parentName: "Separate Force", initialValue: defaultFlockerSeparateForce);
+                flockerStayInBoundsForceTuple = GetCheckBoxTuple(transform: contentTransform, parentName: "Stay in Bounds Force", initialValue: defaultFlockerStayInBoundsForce);
+
+                gameManager.flockerAlignForce = defaultFlockerAlignForce;
+                gameManager.flockerSeparateForce = defaultFlockerSeparateForce;
+                gameManager.flockerStayInBoundsForce = defaultFlockerStayInBoundsForce;
                 break;
         }
     }
@@ -203,6 +222,15 @@ public class UIManager : MonoBehaviour
         Text text = parent.Find("Stat").GetComponent<Text>();
         return (slider, text);
     }
+
+    private (Toggle, Text) GetCheckBoxTuple(Transform transform, string parentName, bool initialValue)
+    {
+        Transform parent = transform.Find(parentName);
+        Toggle checkBox = parent.Find("Toggle").GetComponent<Toggle>();
+        checkBox.isOn = initialValue;
+        Text text = parent.Find("Name").GetComponent<Text>();
+        return (checkBox, text);
+    }
     private float UpdateStats((Slider, Text) tuple)
     {
         float value = tuple.Item1.value;
@@ -212,7 +240,6 @@ public class UIManager : MonoBehaviour
         return tuple.Item1.value;
     }
 
-    
     private void UpdateSeekerStats()
     {
         gameManager.seekerMass = UpdateStats(seekerMassTuple);
@@ -282,4 +309,38 @@ public class UIManager : MonoBehaviour
             pb.Item2.interactable = true;
         }
     }
+
+    #region CheckBox Methods
+    public void ToggleFlockerAlignForce(bool value)
+    {
+        gameManager.flockerAlignForce = value;
+        ToggleStatInteractability(flockerAlignDistanceTuple, value);
+        ToggleStatInteractability(flockerAlignWeightTuple, value);
+    }
+
+    public void ToggleFlockerSeparateForce(bool value)
+    {
+        gameManager.flockerSeparateForce = value;
+        ToggleStatInteractability(flockerSeparateDistanceTuple, value);
+        ToggleStatInteractability(flockerSeparateWeightTuple, value);
+    }
+
+    public void ToggleFlockerStayInBounds(bool value)
+    {
+        gameManager.flockerStayInBoundsForce = value;
+        ToggleStatInteractability(flockerStayInBoundsFutureTimeTuple, value);
+        ToggleStatInteractability(flockerStayInBoundsWeightTuple, value);
+    }
+
+    private void ToggleStatInteractability((Slider, Text) tuple, bool value)
+    {
+        Color color = value ? enabledTupleColor : disabledTupleColor;
+        //toggle the slider usability
+        tuple.Item1.interactable = value;
+
+        //change the color of the text
+        tuple.Item2.color = color;
+        tuple.Item1.transform.Find("../Name").GetComponent<Text>().color = color;
+    }
+    #endregion
 }

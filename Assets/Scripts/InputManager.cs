@@ -19,7 +19,7 @@ public class InputManager : MonoBehaviour
     }
     public void CreateCircle(InputAction.CallbackContext context)
     {
-        //Only want to call when click is pressed
+        //Only want to call when click is pressed and when in obstacle avoidance test scene
         if (context.started || context.canceled || gameManager.SceneCheckerProperty != GameManager.SceneChecker.ObstacleAvoidanceTest)
             return;
 

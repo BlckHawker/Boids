@@ -7,8 +7,29 @@ using static UnityEngine.RuleTile.TilingRuleOutput;
 using rnd = UnityEngine.Random;
 public abstract class Agent : MonoBehaviour
 {
+    #region Force Colors
+    protected Color stayInBoundsColor = Color.magenta;
+    protected Color wanderColor = Color.cyan;
+    protected Color avoidObstacleColor = Color.red;
+    protected Color separateColor = Color.green;
+    protected Color alignColor = Color.yellow;
+    #endregion
+
     #region Force Weights
-    protected float seekWeight, fleerWeight, wanderWeight, stayInBoundsWeight, avoidObstacleWeight, separateWeight, alignWeight;
+    protected float seekWeight, fleeWeight, wanderWeight, stayInBoundsWeight, avoidObstacleWeight, separateWeight, alignWeight;
+    #endregion
+
+    #region Force Booleans
+    protected bool avoidObstacleForce, alignForce, separateForce, stayInBoundsForce, wanderForce, seekForce, fleeForce;
+
+    public bool SeekForce { set { seekForce = value; } }
+    public bool FleeForce { set { fleeForce = value; } }
+    public bool AvoidObstacleForce { set { avoidObstacleForce = value; } }
+    public bool AlignForce { set { alignForce = value; } }
+    public bool StayInBoundsForce { set { stayInBoundsForce = value; } }
+    public bool WanderForce { set { wanderForce = value; } }
+    public bool SeparateForce { set { separateForce = value; } }
+    #endregion
 
     #region Setters
     public float AlignDistance { set { alignDistance = value; } }
@@ -16,7 +37,7 @@ public abstract class Agent : MonoBehaviour
     public float SeparateDistance { set { separateDistance = value; } }
     public float SeparateWeight { set { separateWeight = value; } }
     public float AvoidObstacleWeight { set { avoidObstacleWeight = value;  } }
-    public float FleeWeight { set { fleerWeight = value; } }
+    public float FleeWeight { set { fleeWeight = value; } }
     public float Radius { get { return radius; } }
     public float SeekWeight { set { seekWeight = value; } }
     public float StayInBoundsFutureTime { set { stayInBoundsFutureTime = value; } }
@@ -28,7 +49,6 @@ public abstract class Agent : MonoBehaviour
     public float WanderWeight { set { wanderWeight = value; } }
     #endregion
 
-    #endregion
     #region Bound Variables
     protected float radius, stayInBoundsFutureTime, wanderFutureTime;
     protected Bounds agentBounds;
@@ -73,6 +93,25 @@ public abstract class Agent : MonoBehaviour
     private Vector2 wanderFuturePosition { get { return Position + velocity * wanderFutureTime; } }
     private Vector2 stayInBoundsFuturePosition { get { return Position + velocity * stayInBoundsFutureTime; } }
     private Vector2 avoidObstacleFuturePosition { get { return Position + velocity * avoidTime; } }
+
+    private bool OutOfBounds 
+    { 
+        get {
+            Vector2 futurePosition = stayInBoundsFuturePosition;
+
+            float wallMinX = WallBounds.min.x;
+            float wallMaxX = WallBounds.max.x;
+            float wallMinY = WallBounds.min.y;
+            float wallMaxY = WallBounds.max.y;
+
+            bool left = futurePosition.x < wallMinX;
+            bool right = futurePosition.x > wallMaxX;
+            bool up = futurePosition.y > wallMaxY;
+            bool down = futurePosition.y < wallMinY;
+
+            return left || right || up || down;
+        }
+    }
     #endregion
     #endregion
     // Start is called before the first frame update
@@ -187,23 +226,14 @@ public abstract class Agent : MonoBehaviour
     }
     protected Vector2 StayInBounds()
     {
-        float wallMinX = WallBounds.min.x;
-        float wallMaxX = WallBounds.max.x;
-        float wallMinY = WallBounds.min.y;
-        float wallMaxY = WallBounds.max.y;
-
-        Vector2 futurePosition = stayInBoundsFuturePosition;
-
-        bool left = futurePosition.x < wallMinX;
-        bool right = futurePosition.x > wallMaxX;
-        bool up = futurePosition.y > wallMaxY;
-        bool down = futurePosition.y < wallMinY;
-
-        if (left || right || up || down)
+        if (OutOfBounds)
+        {
             return Seek(Vector2.zero);
-        
+        }
+
         return Vector2.zero;
     }
+
     protected Vector2 AvoidObstacles()
     {
         Vector2 steeringForce = Vector2.zero;
@@ -261,7 +291,6 @@ public abstract class Agent : MonoBehaviour
 
         return steeringForce;
     }
-
     protected Vector2 Separate()
     {
         Vector2 steeringForce = Vector2.zero;
@@ -289,10 +318,8 @@ public abstract class Agent : MonoBehaviour
         //divide by the average
         return importantSeparateAgentList.Count == 0 ? Vector2.zero : steeringForce / importantSeparateAgentList.Count;
     }
-
     protected Vector2 Align()
     {
-        
         Vector2 desiredVelocity = Vector2.zero;
         importantAlignAgentList.Clear();
 
@@ -338,47 +365,65 @@ public abstract class Agent : MonoBehaviour
     {
         if (Application.isPlaying)
         {
-            //draw stay in bounds
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireCube(Vector2.zero, WallBounds.size);
             //draw stay in bounds future position
-            Gizmos.color = Color.magenta;
+            if (stayInBoundsForce)
+            {
+                Gizmos.color = stayInBoundsColor;
+                Gizmos.DrawLine(Position, stayInBoundsFuturePosition);
+                Gizmos.DrawWireSphere(stayInBoundsFuturePosition, Radius);
 
-            Gizmos.DrawLine(Position, stayInBoundsFuturePosition);
-            Gizmos.DrawWireSphere(stayInBoundsFuturePosition, Radius);
-
+                //draw stay in bounds
+                Gizmos.DrawWireCube(Vector2.zero, WallBounds.size);
+            }
 
             //draw wander future position / target + wander circle + positon the player is seeking
-            Gizmos.color = Color.cyan;
-            Gizmos.DrawLine(Position, wanderFuturePosition);
-            Gizmos.DrawWireSphere(wanderFuturePosition, wanderCircleRadius);
-            Gizmos.DrawLine(wanderFuturePosition, wanderPosition);
-
+            if (wanderForce)
+            {
+                Gizmos.color = wanderColor;
+                Gizmos.DrawLine(Position, wanderFuturePosition);
+                Gizmos.DrawWireSphere(wanderFuturePosition, wanderCircleRadius);
+                Gizmos.DrawLine(wanderFuturePosition, wanderPosition);
+            }
 
             //draw box area to avoid obstacles
-            Gizmos.color = Color.red;
-            if (avoidTime > 0)
+            if (avoidObstacleForce)
             {
+                Gizmos.color = avoidObstacleColor;
                 Vector3 avoidBoxSize = new Vector3(radius * 2f, avoidObstacleFuturePosition.magnitude + radius, radius * 2f);
                 Vector3 boxCenter = new Vector3(0, (avoidObstacleFuturePosition.magnitude + radius) / 2f, 0);
                 Gizmos.matrix = transform.localToWorldMatrix;
                 Gizmos.DrawWireCube(boxCenter, avoidBoxSize);
                 Gizmos.matrix = Matrix4x4.identity;
+
                 //draw lines to important obstacles
-                Debug.Log("important obstacles count: " + importantObstacles.Count);
                 foreach (Obstacle obstacle in importantObstacles)
+                {
                     Gizmos.DrawLine(Position, obstacle.transform.position);
+                }
             }
 
             //draw the closness for seperation
-            Gizmos.color = Color.green;
-
-            if (separateDistance > 0)
+            if (separateForce)
             {
+                Gizmos.color = separateColor;
                 Gizmos.DrawWireSphere(Position, separateDistance);
                 //draw a line to agents that are too close
-            foreach (Agent agent in importantSeparateAgentList)
+                foreach (Agent agent in importantSeparateAgentList)
+                {
                     Gizmos.DrawLine(Position, agent.Position);
+                }
+            }
+
+            //draw the closness for align
+            if (alignForce)
+            {
+                Gizmos.color = alignColor;
+                Gizmos.DrawWireSphere(Position, alignDistance);
+                //draw a line to agents that are too close
+                foreach (Agent agent in importantAlignAgentList)
+                {
+                    Gizmos.DrawLine(Position, agent.Position);
+                }
             }
         }
     }

@@ -58,7 +58,9 @@ public class GameManager : MonoBehaviour
 
     #region Agent Stats
     [NonSerialized]
-    public float seekerStayInBoundsFutureTime, seekerMass, seekerMaxForce, seekerMaxSpeed, seekerWeight, seekerStayInBoundsWeight;
+    public float seekerStayInBoundsFutureTime, seekerMass, seekerMaxForce, seekerMaxSpeed, seekerSeekWeight, seekerStayInBoundsWeight;
+    [NonSerialized]
+    public bool seekerSeekForce, seekerStayInBoundsForce;
     [NonSerialized]
     public float fleerStayInBoundsFutureTime, fleerMass, fleerMaxForce, fleerMaxSpeed, fleerWeight, fleerStayInBoundsWeight;
     [NonSerialized]
@@ -169,9 +171,11 @@ public class GameManager : MonoBehaviour
         seekerComponent.Mass = seekerMass;
         seekerComponent.MaxForce = seekerMaxForce;
         seekerComponent.MaxSpeed = seekerMaxSpeed;
-        seekerComponent.SeekWeight = seekerWeight;
+        seekerComponent.SeekWeight = seekerSeekWeight;
         seekerComponent.StayInBoundsFutureTime = seekerStayInBoundsFutureTime;
         seekerComponent.StayInBoundsWeight = seekerStayInBoundsWeight;
+        seekerComponent.SeekForce = seekerSeekForce;
+        seekerComponent.StayInBoundsForce = seekerStayInBoundsForce;
     }
     private void UpdateFleerValues()
     {

@@ -3261,10 +3261,6 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: flockerCount
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
       propertyPath: sceneChecker
       value: 2
       objectReference: {fileID: 0}
@@ -3272,78 +3268,6 @@ PrefabInstance:
       propertyPath: canvasGameObject
       value: 
       objectReference: {fileID: 1156399789}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: enabledTupleColor.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: enabledTupleColor.b
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: enabledTupleColor.g
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: enabledTupleColor.r
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: disabledTupleColor.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: disabledTupleColor.b
-      value: 0.78431374
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: disabledTupleColor.g
-      value: 0.78431374
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: disabledTupleColor.r
-      value: 0.78431374
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: defaultFlockerMaxForce
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: defaultFlockerMaxSpeed
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: defaultFlockerAlignForce
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: defaultFlockerAlignWeight
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: defaultFlockerAlignDistance
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: defaultFlockerSeparateForce
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: defaultFlockerSeparateWeight
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: defaultFlockerSeparateDistance
-      value: 1.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: defaultFlockerStayInBoundsForce
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
-      propertyPath: defaultFlockerStayInBoundsFutureTime
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 5997322525865454206, guid: 6805cbd6c08ffc24ba86a65c71c77868, type: 3}
       propertyPath: defaultFlockerStayInBoundsWeightTuple
       value: 2

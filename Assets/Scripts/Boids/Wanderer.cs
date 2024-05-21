@@ -9,9 +9,9 @@ public class Wanderer : Agent
     {
         Vector2 totalForce = Vector2.zero;
 
-        totalForce += StayInBounds() * stayInBoundsWeight;
-        totalForce += Wander() * wanderWeight;
-        totalForce += AvoidObstacles() * avoidObstacleWeight;
+        totalForce += stayInBoundsForce ? StayInBounds() * stayInBoundsWeight : Vector2.zero;
+        totalForce += wanderForce ? Wander() * wanderWeight : Vector2.zero;
+        totalForce += avoidObstacleForce ? AvoidObstacles() * avoidObstacleWeight : Vector2.zero;
         totalForce = Vector2.ClampMagnitude(totalForce, MaxForce);
         ApplyForce(totalForce);
     }

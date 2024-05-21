@@ -10,8 +10,8 @@ public class Seeker : Agent
     {
         Vector2 totalForce = Vector2.zero;
 
-        totalForce += Seek(target) * seekWeight;
-        totalForce += StayInBounds() * stayInBoundsWeight;
+        totalForce += seekForce ? Seek(target) * seekWeight : Vector2.zero;
+        totalForce += stayInBoundsForce ? StayInBounds() * stayInBoundsWeight : Vector2.zero;
 
         totalForce = Vector2.ClampMagnitude(totalForce, MaxForce);
 

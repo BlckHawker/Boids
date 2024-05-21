@@ -49,6 +49,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b3bfd3aab811ce4095017bb0e799b6d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  enabledTupleColor: {r: 1, g: 1, b: 1, a: 1}
+  disabledTupleColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
   canvasGameObject: {fileID: 0}
   defaultSeekerFutureTime: 5
   defaultSeekerMass: 0
@@ -74,14 +76,19 @@ MonoBehaviour:
   defaultWandererWanderOffset: 100
   defaultWandererWanderTime: 1
   defaultWandererWanderFutureTime: 7
+  defaultFlockerAlignForce: 1
+  defaultFlockerSeparateForce: 1
+  defaultFlockerStayInBoundsForce: 1
+  defaultFlockerAlignDistance: 1.5
+  defaultFlockerAlignWeight: 5
   flockerCount: 20
-  defaultFlockerStayInBoundsWeightTuple: 0
-  defaultFlockerStayInBoundsFutureTime: 0
+  defaultFlockerStayInBoundsWeight: 0
+  defaultFlockerStayInBoundsFutureTime: 1
   defaultFlockerMass: 0
-  defaultFlockerMaxForce: 0
-  defaultFlockerMaxSpeed: 0
-  defaultFlockerSeparateDistance: 0
-  defaultFlockerSeparateWeight: 0
+  defaultFlockerMaxForce: 3
+  defaultFlockerMaxSpeed: 3
+  defaultFlockerSeparateDistance: 1.5
+  defaultFlockerSeparateWeight: 5
 --- !u!114 &615148651115639377
 MonoBehaviour:
   m_ObjectHideFlags: 0

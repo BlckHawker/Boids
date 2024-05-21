@@ -10,8 +10,8 @@ public class Fleer : Agent
     {
         Vector2 totalForce = Vector2.zero;
 
-        totalForce += Flee(target) * fleeWeight;
-        totalForce += StayInBounds() * stayInBoundsWeight;
+        totalForce += fleeForce ? Flee(target) * fleeWeight : Vector2.zero;
+        totalForce += stayInBoundsForce ? StayInBounds() * stayInBoundsWeight : Vector2.zero;
 
         totalForce = Vector2.ClampMagnitude(totalForce, MaxForce);
         ApplyForce(totalForce);

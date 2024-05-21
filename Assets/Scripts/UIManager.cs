@@ -14,7 +14,8 @@ public class UIManager : MonoBehaviour
     private Color enabledTupleColor, disabledTupleColor;
     [SerializeField]
     private GameObject canvasGameObject;
-    private (Slider, Text) seekerStayInBoundsFutureTimeTuple, seekerMassTuple, seekerMaxForceTuple, seekerMaxSpeedTuple, seekerWeightTuple, seekerStayInBoundTuple;
+    private (Slider, Text) seekerStayInBoundsFutureTimeTuple, seekerMassTuple, seekerMaxForceTuple, seekerMaxSpeedTuple, seekerSeekWeightTuple, seekerStayInBoundsTuple;
+    private (Toggle, Text) seekerStayInBoundsForceTuple, seekerSeekForceTuple;
     private (Slider, Text) fleerStayInBoundsFutureTimeTuple, fleerMassTuple, fleerMaxForceTuple, fleerMaxSpeedTuple, fleerWeightTuple, fleerStayInBoundTuple;
     private (Slider, Text) wandererAvoidTimeTuple, wandererStayInBoundsFutureTimeTuple, wandererWanderFutureTimeTuple, wandererMassTuple, wandererMaxForceTuple, wandererMaxSpeedTuple, wandererObstacleAvoidanceWeightTuple, wandererStayInBoundsWeightTuple, wandererWanderWeightTuple, wandererWanderCircleRadiusTuple, wandererWanderOffsetTuple, wandererWanderTimeTuple;
     private (Slider, Text) flockerAlignDistanceTuple, flockerAlignWeightTuple, flockerStayInBoundsFutureTimeTuple, flockerMassTuple, flockerMaxForceTuple, flockerMaxSpeedTuple, flockerSeparateDistanceTuple, flockerSeparateWeightTuple, flockerStayInBoundsWeightTuple;
@@ -22,8 +23,7 @@ public class UIManager : MonoBehaviour
     #region Seeker Values
     [Header("Seeker Values")]
     [SerializeField, Range(1, 10)]
-    private int defaultSeekerFutureTime;
-
+    private int defaultSeekerStayInBoundsFutureTime;
     [SerializeField, Range(1, 10)]
     private int defaultSeekerMass, defaultSeekerMaxForce, defaultSeekerMaxSpeed, defaultSeekerWeight, defaultSeekerStayInBound;
     #endregion
@@ -110,12 +110,12 @@ public class UIManager : MonoBehaviour
         {
             case GameManager.SceneChecker.SeekerTest:
                 contentTransform = canvasGameObject.transform.Find("Panel/Scroll Area/Content");
-                seekerStayInBoundsFutureTimeTuple = GetStatTuple(contentTransform, parentName: "Future Time", initialValue: defaultSeekerFutureTime);
+                seekerStayInBoundsFutureTimeTuple = GetStatTuple(contentTransform, parentName: "Stay In Bounds Future Time", initialValue: defaultSeekerStayInBoundsFutureTime);
                 seekerMassTuple = GetStatTuple(contentTransform, parentName: "Mass", initialValue: defaultSeekerMass);
                 seekerMaxForceTuple = GetStatTuple(contentTransform, parentName: "Max Force", initialValue: defaultSeekerMaxForce);
                 seekerMaxSpeedTuple = GetStatTuple(contentTransform, parentName: "Max Speed", initialValue: defaultSeekerMaxSpeed);
-                seekerWeightTuple = GetStatTuple(contentTransform, parentName: "Seeker Weight", initialValue: defaultSeekerWeight);
-                seekerStayInBoundTuple = GetStatTuple(contentTransform, parentName: "Stay in Bounds Weight", initialValue: defaultSeekerStayInBound);
+                seekerSeekWeightTuple = GetStatTuple(contentTransform, parentName: "Seeker Weight", initialValue: defaultSeekerWeight);
+                seekerStayInBoundsTuple = GetStatTuple(contentTransform, parentName: "Stay In Bounds Weight", initialValue: defaultSeekerStayInBound);
                 break;
             case GameManager.SceneChecker.FleerTest:
                 Transform statPanel = canvasGameObject.transform.Find("Stat Panel");
@@ -133,9 +133,9 @@ public class UIManager : MonoBehaviour
                 seekerMassTuple = GetStatTuple(seekPanelContent, parentName: "Mass", initialValue: defaultSeekerMass);
                 seekerMaxForceTuple = GetStatTuple(seekPanelContent, parentName: "Max Force", initialValue: defaultSeekerMaxForce);
                 seekerMaxSpeedTuple = GetStatTuple(seekPanelContent, parentName: "Max Speed", initialValue: defaultSeekerMaxSpeed);
-                seekerStayInBoundTuple = GetStatTuple(seekPanelContent, parentName: "Stay in Bounds Weight", initialValue: defaultSeekerStayInBound);
-                seekerWeightTuple = GetStatTuple(seekPanelContent, parentName: "Seeker Weight", initialValue: defaultSeekerWeight); 
-                seekerStayInBoundsFutureTimeTuple = GetStatTuple(seekPanelContent, parentName: "Future Time", initialValue: defaultSeekerFutureTime);
+                seekerStayInBoundsTuple = GetStatTuple(seekPanelContent, parentName: "Stay in Bounds Weight", initialValue: defaultSeekerStayInBound);
+                seekerSeekWeightTuple = GetStatTuple(seekPanelContent, parentName: "Seeker Weight", initialValue: defaultSeekerWeight); 
+                seekerStayInBoundsFutureTimeTuple = GetStatTuple(seekPanelContent, parentName: "Future Time", initialValue: defaultSeekerStayInBoundsFutureTime);
 
                 fleerMassTuple = GetStatTuple(fleePanelContent, parentName: "Mass", initialValue: defaultFleerMass);
                 fleerMaxForceTuple = GetStatTuple(fleePanelContent, parentName: "Max Force", initialValue: defaultFleerMaxForce);
@@ -245,8 +245,8 @@ public class UIManager : MonoBehaviour
         gameManager.seekerMass = UpdateStats(seekerMassTuple);
         gameManager.seekerMaxForce = UpdateStats(seekerMaxForceTuple);
         gameManager.seekerMaxSpeed = UpdateStats(seekerMaxSpeedTuple);
-        gameManager.seekerStayInBoundsWeight = UpdateStats(seekerStayInBoundTuple);
-        gameManager.seekerWeight = UpdateStats(seekerWeightTuple); 
+        gameManager.seekerStayInBoundsWeight = UpdateStats(seekerStayInBoundsTuple);
+        gameManager.seekerSeekWeight = UpdateStats(seekerSeekWeightTuple); 
         gameManager.seekerStayInBoundsFutureTime = UpdateStats(seekerStayInBoundsFutureTimeTuple);
     }
     private void UpdateFleerStats()
@@ -311,6 +311,23 @@ public class UIManager : MonoBehaviour
     }
 
     #region CheckBox Methods
+    #region Seeker Methods
+    public void ToggleSeekerSeekForce(bool value)
+    {
+        gameManager.seekerSeekForce = value;
+        ToggleStatInteractability(seekerSeekWeightTuple, value);
+    }
+
+    public void ToggleSeekerStayInBoundsForce(bool value)
+    {
+        gameManager.seekerStayInBoundsForce = value;
+        ToggleStatInteractability(seekerStayInBoundsFutureTimeTuple, value);
+        ToggleStatInteractability(seekerStayInBoundsTuple, value);
+    }
+
+
+    #endregion
+    #region Flocker Methods
     public void ToggleFlockerAlignForce(bool value)
     {
         gameManager.flockerAlignForce = value;
@@ -331,6 +348,7 @@ public class UIManager : MonoBehaviour
         ToggleStatInteractability(flockerStayInBoundsFutureTimeTuple, value);
         ToggleStatInteractability(flockerStayInBoundsWeightTuple, value);
     }
+    #endregion
 
     private void ToggleStatInteractability((Slider, Text) tuple, bool value)
     {

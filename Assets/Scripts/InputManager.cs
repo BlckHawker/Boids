@@ -7,8 +7,6 @@ using UnityEngine.InputSystem;
 public class InputManager : MonoBehaviour
 {
     [SerializeField]
-    Camera mainCamera;
-    [SerializeField]
     float canvasWidth, canvasHeight;
     ObstacleManager obstacleManager;
     GameManager gameManager;
@@ -19,6 +17,7 @@ public class InputManager : MonoBehaviour
     }
     public void CreateCircle(InputAction.CallbackContext context)
     {
+        Camera c = Camera.main;
         //Only want to call when click is pressed and when in obstacle avoidance test scene
         if (context.started || context.canceled || gameManager.SceneCheckerProperty != GameManager.SceneChecker.ObstacleAvoidanceTest)
             return;
@@ -27,7 +26,7 @@ public class InputManager : MonoBehaviour
 
         Vector3 mousePos = Mouse.current.position.ReadValue();
         Vector2 CameraRatio = gameManager.CameraWdithHeight;
-        Vector2 screenRatio = Camera.main.WorldToScreenPoint(new Vector2(CameraRatio.x / 2, CameraRatio.y / 2));
+        Vector2 screenRatio = c.WorldToScreenPoint(new Vector2(CameraRatio.x / 2, CameraRatio.y / 2));
         Debug.Log(screenRatio);
         Vector2 mouseRatio = new Vector2(mousePos.x / screenRatio.x, mousePos.y / screenRatio.y);
 
@@ -37,7 +36,7 @@ public class InputManager : MonoBehaviour
 
 
         //convert from screen to world view
-        mousePos = Camera.main.ScreenToWorldPoint(mousePos);
+        mousePos = c.ScreenToWorldPoint(mousePos);
 
         //make sure the object is in front of the camera
         mousePos.z = 0;

@@ -18,11 +18,13 @@ public class SeekerUIManager : UIManager
     private int defaultStayInBoundsFutureTime;
     [SerializeField, Range(1, 10)]
     private int defaultMass, defaultMaxForce, defaultMaxSpeed, defaultSeekWeight, defaultStayInBound;
+    protected override void GetGameManager()
+    {
+        gameManager = GetComponent<SeekerGameManager>();
+    }
 
     protected override void GetDefaultValues()
     {
-        gameManager = GetComponent<SeekerGameManager>();
-
         #region Stats
         Transform contentTransform = canvasGameObject.transform.Find("Panel/Scroll Area/Content");
         stayInBoundsFutureTimeTuple = GetStatTuple(contentTransform, parentName: "Stay In Bounds Future Time", initialValue: defaultStayInBoundsFutureTime);
@@ -33,16 +35,18 @@ public class SeekerUIManager : UIManager
 
         #region Seek Force
         seekWeightTuple = GetStatTuple(contentTransform, parentName: "Seek Weight", initialValue: defaultSeekWeight);
-        seekForceTuple = GetCheckBoxTuple(contentTransform, "Seek Force", defaultSeekForce);
+        GetCheckBoxTuple(contentTransform, "Seek Force", defaultSeekForce);
         gameManager.seekForce = defaultSeekForce;
         #endregion
 
         #region Stay in Bounds Force
         stayInBoundsTuple = GetStatTuple(contentTransform, parentName: "Stay In Bounds Weight", initialValue: defaultStayInBound);
-        stayInBoundsForceTuple = GetCheckBoxTuple(contentTransform, parentName: "Stay In Bounds Force", initialValue: defaultStayInBoundsForce);
+        GetCheckBoxTuple(contentTransform, parentName: "Stay In Bounds Force", initialValue: defaultStayInBoundsForce);
         gameManager.seekForce = defaultStayInBoundsForce;
         #endregion
     }
+
+    
 
     protected override void UpdateAgentStats()
     {

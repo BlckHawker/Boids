@@ -18,8 +18,7 @@ public class SeekerGameManager : GameManager
     #endregion
 
     private GameObject dummy;
-    private Agent seeker;
-    private Seeker seekerComponent;
+    private Seeker seeker;
     private SeekerCollisionChecker collisionChecker;
 
     protected override void InstantiateObjects()
@@ -29,23 +28,22 @@ public class SeekerGameManager : GameManager
 
         seeker = Instantiate(seekerPrefab);
         seeker.transform.position = GetRandomPosition();
-        seekerComponent = seeker.GetComponent<Seeker>();
-        seekerComponent.Target = dummy;
+        seeker.Target = dummy;
 
         collisionChecker.DummyObject = dummy;
-        collisionChecker.Seeker = seekerComponent;
+        collisionChecker.Seeker = seeker;
     }
 
     protected override void UpdateValues()
     {
-        seekerComponent.Mass = mass;
-        seekerComponent.MaxForce = maxForce;
-        seekerComponent.MaxSpeed = maxSpeed;
-        seekerComponent.SeekWeight = seekWeight;
-        seekerComponent.StayInBoundsFutureTime = stayInBoundsFutureTime;
-        seekerComponent.StayInBoundsWeight = stayInBoundsWeight;
-        seekerComponent.SeekForce = seekForce;
-        seekerComponent.StayInBoundsForce = stayInBoundsForce;
+        seeker.Mass = mass;
+        seeker.MaxForce = maxForce;
+        seeker.MaxSpeed = maxSpeed;
+        seeker.SeekWeight = seekWeight;
+        seeker.StayInBoundsFutureTime = stayInBoundsFutureTime;
+        seeker.StayInBoundsWeight = stayInBoundsWeight;
+        seeker.SeekForce = seekForce;
+        seeker.StayInBoundsForce = stayInBoundsForce;
 
         if (collisionChecker.AgentCircleCollision())
         { 
@@ -55,7 +53,7 @@ public class SeekerGameManager : GameManager
 
     protected override void UpdateAgentWallBounds()
     {
-        seekerComponent.WallBounds = WallBounds;
+        seeker.WallBounds = WallBounds;
     }
 
     protected override void GetCollisionChecker()

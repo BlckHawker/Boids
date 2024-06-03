@@ -8,19 +8,6 @@ using System.Security.Authentication.ExtendedProtection;
 
 public abstract class GameManager : MonoBehaviour
 {
-    public enum SceneChecker
-    {
-        SeekerTest,
-        FleerTest,
-        FlockingTest,
-        ObstacleAvoidanceTest,
-        WandererTest
-    }
-
-    [SerializeField]
-    private SceneChecker sceneChecker;
-    public SceneChecker SceneCheckerProperty { get { return sceneChecker; } }
-
     private ObstacleManager obstacleManager;
 
     public Vector2 CameraWdithHeight { get {
@@ -44,14 +31,12 @@ public abstract class GameManager : MonoBehaviour
 
     //private List<Flocker> flockers;
 
-    private Agent fleer, wanderer;
-    private Fleer fleerComponent;
+    private Agent wanderer;
     private Wanderer wandererComponent;
     #endregion
 
     #region Agent Stats
-    [NonSerialized]
-    public float fleerStayInBoundsFutureTime, fleerMass, fleerMaxForce, fleerMaxSpeed, fleerWeight, fleerStayInBoundsWeight;
+    
     [NonSerialized]
     public float wandererAvoidTime, wandererObstacleAvoidanceWeight, wandererStayInBoundsFutureTime, wandererWanderFutureTime, wandererMass, wandererMaxForce, wandererMaxSpeed, wandererStayInBoundsWeight, wandererWanderWeight, wandererWanderCircleRadius, wandererWanderOffset, wandererWanderTime;
     [NonSerialized]
@@ -70,44 +55,34 @@ public abstract class GameManager : MonoBehaviour
         GetCollisionChecker();
         obstacleManager = GetComponent<ObstacleManager>();
         obstacleManager.ObstacleList = new List<Obstacle>();
-        switch (sceneChecker)
-        {
-            case SceneChecker.SeekerTest:
-                break;
+        //switch (sceneChecker)
+        //{
+        //    case SceneChecker.SeekerTest:
+        //        break;
 
-            case SceneChecker.FleerTest:
-                //fleer = Instantiate(fleerPrefab);
-                //seeker = Instantiate(seekerPrefab);
+        //    case SceneChecker.FleerTest:
+        //        break;
 
-                //seekerComponent = seeker.GetComponent<Seeker>();
-                //seekerComponent.Position = GetRandomPosition();
-                //seekerComponent.Target = fleer.gameObject;
+        //    case SceneChecker.WandererTest:
+        //    case SceneChecker.ObstacleAvoidanceTest:
+        //        //wanderer = Instantiate(wandererPrefab);
+        //        //wandererComponent = wanderer.GetComponent<Wanderer>();
+        //        break;
 
-                //fleerComponent = fleer.GetComponent<Fleer>();
-                //fleerComponent.Position = GetRandomPosition();
-                //fleerComponent.Target = seeker.gameObject;
-                break;
-
-            case SceneChecker.WandererTest:
-            case SceneChecker.ObstacleAvoidanceTest:
-                //wanderer = Instantiate(wandererPrefab);
-                //wandererComponent = wanderer.GetComponent<Wanderer>();
-                break;
-
-            case SceneChecker.FlockingTest:
-                //for (int i = 0; i < uiManager.FlockerCount; i++)
-                //{
-                //    Flocker flocker = Instantiate(flockerPrefab);
-                //    flocker.Position = GetRandomPosition();
-                //    flockers.Add(flocker);
-                //}
+        //    case SceneChecker.FlockingTest:
+        //        //for (int i = 0; i < uiManager.FlockerCount; i++)
+        //        //{
+        //        //    Flocker flocker = Instantiate(flockerPrefab);
+        //        //    flocker.Position = GetRandomPosition();
+        //        //    flockers.Add(flocker);
+        //        //}
                 
-                //foreach (Flocker flocker in flockers)
-                //{
-                //    flocker.FlockingList = flockers.Select(f => (Agent)f).ToList();
-                //}
-            break;
-        }
+        //        //foreach (Flocker flocker in flockers)
+        //        //{
+        //        //    flocker.FlockingList = flockers.Select(f => (Agent)f).ToList();
+        //        //}
+        //    break;
+        //}
         InstantiateObjects();
         UpdateAgentWallBounds();
     }
@@ -139,34 +114,25 @@ public abstract class GameManager : MonoBehaviour
     //    }
     //}
 
-    private void UpdateFleerValues()
-    {
-        fleerComponent.Mass = fleerMass;
-        fleerComponent.MaxForce = fleerMaxForce;
-        fleerComponent.MaxSpeed = fleerMaxSpeed;
-        fleerComponent.FleeWeight = fleerWeight;
-        fleerComponent.StayInBoundsFutureTime = fleerStayInBoundsFutureTime;
-        fleerComponent.StayInBoundsWeight = fleerStayInBoundsWeight;
-    }
     private void UpdateWandererValues()
     {
-        wandererComponent.Mass = wandererMass;
-        wandererComponent.MaxForce = wandererMaxForce;
-        wandererComponent.MaxSpeed = wandererMaxSpeed;
-        wandererComponent.StayInBoundsFutureTime = wandererStayInBoundsFutureTime;
-        wandererComponent.StayInBoundsWeight = wandererStayInBoundsWeight;
-        wandererComponent.WanderCircleRadius = wandererWanderCircleRadius;
-        wandererComponent.WanderFutureTime = wandererWanderFutureTime;
-        wandererComponent.WanderWeight = wandererWanderWeight;
-        wandererComponent.WanderOffset = wandererWanderOffset;
-        wandererComponent.WanderTime = wandererWanderTime;
+        //wandererComponent.Mass = wandererMass;
+        //wandererComponent.MaxForce = wandererMaxForce;
+        //wandererComponent.MaxSpeed = wandererMaxSpeed;
+        //wandererComponent.StayInBoundsFutureTime = wandererStayInBoundsFutureTime;
+        //wandererComponent.StayInBoundsWeight = wandererStayInBoundsWeight;
+        //wandererComponent.WanderCircleRadius = wandererWanderCircleRadius;
+        //wandererComponent.WanderFutureTime = wandererWanderFutureTime;
+        //wandererComponent.WanderWeight = wandererWanderWeight;
+        //wandererComponent.WanderOffset = wandererWanderOffset;
+        //wandererComponent.WanderTime = wandererWanderTime;
 
-        if(sceneChecker == SceneChecker.ObstacleAvoidanceTest) 
-        {
-            wandererComponent.AvoidTime = wandererAvoidTime;
-            wandererComponent.AvoidObstacleWeight = wandererObstacleAvoidanceWeight;
-            wandererComponent.ObstacleList = obstacleManager.ObstacleList;
-        }
+        //if(sceneChecker == SceneChecker.ObstacleAvoidanceTest) 
+        //{
+        //    wandererComponent.AvoidTime = wandererAvoidTime;
+        //    wandererComponent.AvoidObstacleWeight = wandererObstacleAvoidanceWeight;
+        //    wandererComponent.ObstacleList = obstacleManager.ObstacleList;
+        //}
     }
 
     private void UpdateFlockerValues()

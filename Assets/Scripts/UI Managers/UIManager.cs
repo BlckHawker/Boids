@@ -5,14 +5,12 @@ using UnityEngine.UI;
 
 public abstract class UIManager : MonoBehaviour
 {
-    //todo: set the enabled colors of the tuples during initalization
-    //todo: make it so forces don't apply if the force check box is disabled
     [SerializeField]
     protected Color enabledTupleColor, disabledTupleColor;
     [SerializeField]
     protected GameObject canvasGameObject;
     
-    private (Slider, Text) fleerStayInBoundsFutureTimeTuple, fleerMassTuple, fleerMaxForceTuple, fleerMaxSpeedTuple, fleerWeightTuple, fleerStayInBoundTuple;
+    
     private (Slider, Text) wandererAvoidTimeTuple, wandererStayInBoundsFutureTimeTuple, wandererWanderFutureTimeTuple, wandererMassTuple, wandererMaxForceTuple, wandererMaxSpeedTuple, wandererObstacleAvoidanceWeightTuple, wandererStayInBoundsWeightTuple, wandererWanderWeightTuple, wandererWanderCircleRadiusTuple, wandererWanderOffsetTuple, wandererWanderTimeTuple;
     private (Slider, Text) flockerAlignDistanceTuple, flockerAlignWeightTuple, flockerStayInBoundsFutureTimeTuple, flockerMassTuple, flockerMaxForceTuple, flockerMaxSpeedTuple, flockerSeparateDistanceTuple, flockerSeparateWeightTuple, flockerStayInBoundsWeightTuple;
     private (Toggle, Text) flockerAlignForceTuple, flockerSeparateForceTuple, flockerStayInBoundsForceTuple;
@@ -21,12 +19,7 @@ public abstract class UIManager : MonoBehaviour
     #endregion
 
     #region Fleer Values
-    [Header("Fleer Values")]
-    [SerializeField, Range(1, 10)]
-    private int defaultFleerFutureTime;
-
-    [SerializeField, Range(1, 10)]
-    private int defaultFleerMass, defaultFleerMaxForce, defaultFleerMaxSpeed, defaultFleerWeight, defaultFleerStayInBound;
+    
     #endregion
 
     #region Wanderer Values
@@ -89,12 +82,10 @@ public abstract class UIManager : MonoBehaviour
     public int FlockerCount { get { return flockerCount; } }
     #endregion
 
-    private Button seekerButton, fleerButton;
-    private GameObject seekPanel, fleePanel;
-
-    private List<(GameObject, Button)> panelsAndButtons;
+    protected List<(GameObject, Button)> panelsAndButtons;
     void Start()
     {
+        GetGameManager();
         GetDefaultValues();
 
         //switch (gameManager.SceneCheckerProperty)
@@ -103,32 +94,7 @@ public abstract class UIManager : MonoBehaviour
                 
         //        break;
             //case GameManager.SceneChecker.FleerTest:
-            //    Transform statPanel = canvasGameObject.transform.Find("Stat Panel");
-            //    fleePanel = statPanel.Find("Flee Panel").gameObject;
-            //    seekPanel = statPanel.Find("Seek Panel").gameObject;
 
-            //    Transform fleePanelContent = fleePanel.transform.Find("Scroll Area/Content");
-            //    Transform seekPanelContent = seekPanel.transform.Find("Scroll Area/Content");
-
-            //    seekerButton = statPanel.Find("Seeker Button").GetComponent<Button>();
-            //    fleerButton = statPanel.Find("Flee Button").GetComponent<Button>();
-            //    panelsAndButtons = new List<(GameObject, Button)>() { (seekPanel, seekerButton), (fleePanel, fleerButton) };
-
-
-            //    seekerMassTuple = GetStatTuple(seekPanelContent, parentName: "Mass", initialValue: defaultSeekerMass);
-            //    seekerMaxForceTuple = GetStatTuple(seekPanelContent, parentName: "Max Force", initialValue: defaultSeekerMaxForce);
-            //    seekerMaxSpeedTuple = GetStatTuple(seekPanelContent, parentName: "Max Speed", initialValue: defaultSeekerMaxSpeed);
-            //    seekerStayInBoundsTuple = GetStatTuple(seekPanelContent, parentName: "Stay in Bounds Weight", initialValue: defaultSeekerStayInBound);
-            //    seekerSeekWeightTuple = GetStatTuple(seekPanelContent, parentName: "Seeker Weight", initialValue: defaultSeekerWeight); 
-            //    seekerStayInBoundsFutureTimeTuple = GetStatTuple(seekPanelContent, parentName: "Future Time", initialValue: defaultSeekerStayInBoundsFutureTime);
-
-            //    fleerMassTuple = GetStatTuple(fleePanelContent, parentName: "Mass", initialValue: defaultFleerMass);
-            //    fleerMaxForceTuple = GetStatTuple(fleePanelContent, parentName: "Max Force", initialValue: defaultFleerMaxForce);
-            //    fleerMaxSpeedTuple = GetStatTuple(fleePanelContent, parentName: "Max Speed", initialValue: defaultFleerMaxSpeed);
-            //    fleerStayInBoundTuple = GetStatTuple(fleePanelContent, parentName: "Stay in Bounds Weight", initialValue: defaultFleerStayInBound);
-            //    fleerWeightTuple = GetStatTuple(fleePanelContent, parentName: "Flee Weight", initialValue: defaultFleerWeight); 
-            //    fleerStayInBoundsFutureTimeTuple = GetStatTuple(fleePanelContent, parentName: "Future Time", initialValue: defaultFleerWeight);
-            //    ShowSeekPanel();
             //    break;
             //case GameManager.SceneChecker.WandererTest:
             //case GameManager.SceneChecker.ObstacleAvoidanceTest:
@@ -212,13 +178,11 @@ public abstract class UIManager : MonoBehaviour
         return (slider, text);
     }
 
-    protected (Toggle, Text) GetCheckBoxTuple(Transform transform, string parentName, bool initialValue)
+    protected void GetCheckBoxTuple(Transform transform, string parentName, bool initialValue)
     {
         Transform parent = transform.Find(parentName);
         Toggle checkBox = parent.Find("Toggle").GetComponent<Toggle>();
         checkBox.isOn = initialValue;
-        Text text = parent.Find("Name").GetComponent<Text>();
-        return (checkBox, text);
     }
     protected float UpdateStats((Slider, Text) tuple)
     {
@@ -233,6 +197,8 @@ public abstract class UIManager : MonoBehaviour
     {
         
     }
+
+    protected abstract void GetGameManager();
     //private void UpdateFleerStats()
     //{
     //    gameManager.fleerMass = UpdateStats(fleerMassTuple);
@@ -273,22 +239,11 @@ public abstract class UIManager : MonoBehaviour
     //    gameManager.flockerSeparateDistance = UpdateStats(flockerSeparateDistanceTuple);
     //    gameManager.flockerSeparateWeight = UpdateStats(flockerSeparateWeightTuple);
     //}
-    public void ShowSeekPanel()
-    {
-        HideAllPanels();
-        seekPanel.SetActive(true);
-        seekerButton.interactable = false;
-    }
-    public void ShowFleePanel()
-    {
-        HideAllPanels();
-        fleePanel.SetActive(true);
-        fleerButton.interactable = false;
-    }
-    private void HideAllPanels()
+
+    protected void HideAllPanels()
     {
         foreach ((GameObject, Button) pb in panelsAndButtons)
-        { 
+        {
             pb.Item1.SetActive(false);
             pb.Item2.interactable = true;
         }
